@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JV CELL - Gestão Contábil & Técnica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // CONFIGURAÇÃO DO SEU FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcDbAg1EoJcw_1qQP5GzMNg8uZJSHgySc",
+            authDomain: "jv-cell-web.firebaseapp.com",
+            projectId: "jv-cell-web",
+            storageBucket: "jv-cell-web.appspot.com",
+            messagingSenderId: "717678063335",
+            appId: "1:717678063335:web:b9498842d4f2081d5fcf7c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.db = getFirestore(app);
+    </script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans antialiased">
+
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center z-50 p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-6 border border-gray-100">
+            <div class="flex flex-col items-center justify-center mb-2">
+                <div class="w-24 h-24 bg-slate-900 rounded-2xl flex items-center justify-center p-2 shadow-xl border-2 border-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="w-full h-full">
+                        <rect x="50" y="20" width="140" height="200" rx="20" fill="#1e293b" stroke="#2563eb" stroke-width="6"/>
+                        <rect x="60" y="35" width="120" height="170" rx="10" fill="#0b0f19"/>
+                        <circle cx="120" cy="28" r="3" fill="#475569"/>
+                        <g stroke="#d97706" stroke-width="4" fill="none" opacity="0.6">
+                            <circle cx="120" cy="120" r="30" stroke-dasharray="10 6"/>
+                        </g>
+                        <path d="M70,170 L105,135" stroke="#f59e0b" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M65,175 L75,165" stroke="#94a3b8" stroke-width="9" stroke-linecap="round"/>
+                        <text x="120" y="112" font-family="Arial, sans-serif" font-weight="900" font-size="32" fill="#ffffff" text-anchor="middle">JV</text>
+                        <text x="120" y="142" font-family="Arial, sans-serif" font-weight="900" font-size="26" fill="#60a5fa" text-anchor="middle">CEL</text>
+                    </svg>
+                </div>
+                <h1 id="authTitle" class="text-3xl font-extrabold text-blue-600 tracking-wider mt-3">JV CELL</h1>
+                <p id="authSubtitle" class="text-sm text-gray-500 mt-1">Gerenciamento Fiscal & Operacional</p>
+            </div>
+
+            <form id="loginForm" onsubmit="autenticar(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail corporativo</label>
+                    <input type="email" id="loginUser" required placeholder="jvcell@gmail.com" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Senha de Acesso</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="rememberMe" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="rememberMe" class="ml-2 block text-sm text-gray-900 font-medium select-none cursor-pointer">Lembrar senha neste dispositivo</label>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-md">
+                    Entrar no Painel
+                </button>
+                <p class="text-center text-sm text-gray-600 mt-2">
+                    
+                </p>
+            </form>
+
+            <form id="cadastroForm" onsubmit="criarNovaConta(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nome Completo / Usuário</label>
+                    <input type="text" id="cadName" required placeholder="Nome do Técnico" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail de Acesso</label>
+                    <input type="email" id="cadUser" required placeholder="tecnico@jvcell.com" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nova Senha</label>
+                    <input type="password" id="cadPassword" required placeholder="••••••••" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white p-2.5 rounded-lg font-bold hover:bg-green-700 transition shadow-md">
+                    Criar Conta
+                </button>
+                <p class="text-center text-sm text-gray-600 mt-2">
+                    Já tem uma conta? <button type="button" onclick="alternarAbasAuth('login')" class="text-blue-600 font-bold hover:underline">Fazer Login</button>
+                </p>
+            </form>
+
+            <p id="loginErro" class="text-center text-sm text-red-600 font-bold hidden">E-mail ou senha incorretos!</p>
+            <p id="cadSucesso" class="text-center text-sm text-green-600 font-bold hidden">Conta criada com sucesso! Faça login.</p>
+        </div>
+    </div>
+
+    <div id="mainSystem" class="hidden">
+        
+        <nav class="bg-blue-600 text-white p-4 shadow-lg sticky top-0 z-40">
+            <div class="container mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3 justify-between w-full lg:w-auto">
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleMenu()" class="text-white hover:text-gray-200 focus:outline-none mr-2 bg-blue-700 p-2 rounded-lg">
+                            <span class="text-xl block font-bold leading-none">☰</span>
+                        </button>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="w-10 h-10 drop-shadow-md">
+                            <rect x="50" y="20" width="140" height="200" rx="20" fill="#1e293b" stroke="#ffffff" stroke-width="6"/>
+                            <rect x="60" y="35" width="120" height="170" rx="10" fill="#0f172a"/>
+                            <text x="120" y="115" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#ffffff" text-anchor="middle">JV</text>
+                            <text x="120" y="142" font-family="Arial, sans-serif" font-weight="900" font-size="24" fill="#3b82f6" text-anchor="middle">CEL</text>
+                        </svg>
+                        <h1 class="text-xl font-black tracking-widest">JV CELL</h1>
+                    </div>
+                    <button onclick="deslogar()" class="lg:hidden text-xs bg-red-500 px-2 py-1 rounded font-bold">Sair</button>
+                </div>
+                
+                <div id="navContainer" class="hidden lg:flex flex-col lg:flex-row flex-wrap gap-1.5 justify-center w-full lg:w-auto">
+                    <button id="btn-nav-dashboard" onclick="showSection('dashboard')" class="nav-btn bg-blue-800 px-3 py-2 rounded-lg text-sm font-semibold transition text-left lg:text-center">Início</button>
+                    <button id="btn-nav-orcamentos" onclick="showSection('orcamentos')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700 text-left lg:text-center">Orçamentos Pendentes ⚠️</button>
+
+                    <button id="btn-nav-clientes" onclick="showSection('clientes')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700 text-left lg:text-center">Adicionar Clientes</button>
+            
+                    <button id="btn-nav-os" onclick="showSection('os')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700 text-left lg:text-center">Ordens de Serviço</button>
+                    <button id="btn-nav-planilha" onclick="showSection('planilha')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700 text-left lg:text-center">Planilha & Gráficos</button>
+        
+                    <button id="btn-nav-garantias" onclick="showSection('garantias')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700 text-left lg:text-center">Garantias (3M)</button>
+                    <button id="btn-nav-estoque" onclick="showSection('estoque')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700 text-left lg:text-center">Estoque de Peças</button>
+
+                    <button onclick="deslogar()" class="hidden lg:block bg-red-500 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition shadow">Sair</button>
+                    
+                    
+                        <input type="file" id="inputArquivo" class="hidden" onchange="importarBackup(event)">
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mx-auto p-4 md:p-6 space-y-6">
+
+            <section id="dashboard" class="tab-content space-y-6">
+                <div class="border-b pb-2">
+                    <h2 class="text-xl font-bold text-gray-800">Resumo Diário Operacional (Hoje)</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-900 text-white p-5 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                        <p class="text-xs text-slate-400 font-bold uppercase">Faturamento Líquido (Hoje)</p>
+                        <p id="fat-hoje" class="text-2xl font-bold text-white">R$ 0,00</p>
+                    </div>
+                    <div class="bg-slate-900 text-white p-5 rounded-xl shadow-sm border-l-4 border-rose-400">
+                        <p class="text-xs text-slate-400 font-bold uppercase">Custo de Peças (Hoje)</p>
+                        <p id="custo-hoje" class="text-2xl font-bold text-rose-400">R$ 0,00</p>
+                    </div>
+                    <div class="bg-slate-900 text-white p-5 rounded-xl shadow-sm border-l-4 border-cyan-400">
+                        <p class="text-xs text-cyan-400 font-bold uppercase">Lucro Líquido Real (Hoje)</p>
+                        <p id="lucro-hoje" class="text-2xl font-black text-emerald-400">R$ 0,00</p>
+                    </div>
+                </div>
+
+                <div class="border-b pb-2 pt-4">
+                    <h2 class="text-xl font-bold text-slate-700">Resumo Mensal Consolidado (Mês Atual)</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-800 text-white p-5 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                        <p class="text-xs text-slate-400 font-bold uppercase">Faturamento Acumulado (Mês)</p>
+                        <p id="fat-mes" class="text-2xl font-bold text-white">R$ 0,00</p>
+                    </div>
+                    <div class="bg-slate-800 text-white p-5 rounded-xl shadow-sm border-l-4 border-rose-400">
+                        <p class="text-xs text-slate-400 font-bold uppercase">Custo Total de Peças (Mês)</p>
+                        <p id="custo-mes" class="text-2xl font-bold text-rose-400">R$ 0,00</p>
+                    </div>
+                    <div class="bg-slate-900 text-white p-5 rounded-xl shadow-sm border-l-4 border-cyan-400">
+                        <p class="text-xs text-cyan-400 font-bold uppercase">Lucro Líquido Global (Mês)</p>
+                        <p id="lucro-mes" class="text-2xl font-black text-emerald-400">R$ 0,00</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="clientes" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Área de Cadastro de Clientes</h2>
+                
+                <form id="clienteForm" onsubmit="salvarCliente(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="hidden" id="editClienteId" value="">
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nome Completo do Cliente *</label>
+                        <input type="text" id="cNome" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp / Telefone *</label>
+                        <input type="text" id="cTelefone" placeholder="(00) 00000-0000" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Endereço (Rua, Número, Bairro) *</label>
+                        <input type="text" id="cRua" placeholder="Rua Exemplo, 123 - Bairro Centro" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Cidade / Estado *</label>
+                        <input type="text" id="cCidade" placeholder="Hortolândia - SP" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="md:col-span-3 text-right flex justify-end gap-2">
+                        <button type="button" id="btnCancelarEdicao" onclick="cancelarEdicaoCliente()" class="bg-gray-400 text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-500 transition hidden">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="btnSalvarCliente" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition">
+                            Salvar Ficha do Cliente
+                        </button>
+                    </div>
+                </form>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                    <div class="p-3 bg-amber-50 text-xs font-semibold text-amber-800 italic">💡 Clique sobre o nome de qualquer cliente listado abaixo para ver o histórico completo de serviços dele!</div>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
+                                <th class="p-3">Nome do Cliente / Endereço</th>
+                                <th class="p-3">Contato</th>
+                                <th class="p-3 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaClientes" class="divide-y divide-gray-100 text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="historicoClientes" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-bold border-b pb-2 text-amber-600">Pasta de Histórico de Serviços por Cliente</h2>
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center gap-4">
+                    <div class="w-full md:w-1/3">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Selecione o Cliente Cadastrado:</label>
+                        <select id="selectFiltroHistorico" onchange="renderizarHistoricoEspecifico(this.value)" class="w-full p-2 border rounded bg-white font-bold text-gray-700 focus:ring-2 focus:ring-amber-500 outline-none"></select>
+                    </div>
+                    <div class="text-xs text-gray-400 pt-4 md:pt-0">
+                        Mostra uma linha do tempo detalhada com todos os aparelhos e ordens vinculadas a este cadastro.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase mb-4">Serviços Localizados no Banco de Dados:</h3>
+                    <div id="cronologiaServicos" class="space-y-4"></div>
+                </div>
+            </section>
+<section id="orcamentos" class="tab-content hidden space-y-6">
+    <h2 class="text-xl font-bold border-b pb-2 text-amber-600">O.S. em Estado de Orçamento</h2>
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-amber-50 border-b border-gray-200 text-amber-800 text-xs uppercase font-bold tracking-wider">
+                    <th class="p-3">Cliente</th>
+                    <th class="p-3">Aparelhos</th>
+                    <th class="p-3">Data</th>
+                    <th class="p-3 text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaOrcamentos" class="divide-y divide-gray-100 text-sm"></tbody>
+        </table>
+    </div>
+</section>
+
+            <section id="os" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600" id="tituloFormOS">Entrada de Ordens de Serviço (O.S.)</h2>
+                
+                <form id="osForm" onsubmit="salvarOS(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                    <input type="hidden" id="editOSId" value="">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Cliente Vinculado *</label>
+                            <select id="osCliente" required class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-500"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Status Inicial</label>
+                            <select id="osStatus" class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Orçamento">Orçamento</option>
+                                <option value="Aprovado">Aprovado / Em Reparo</option>
+                                <option value="Realizado">Realizado / Concluído</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Data de Entrega / Registro</label>
+                            <input type="date" id="osData" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-2">
+                        <h3 class="text-sm font-bold text-gray-600 mb-2 uppercase tracking-wide">Aparelhos vinculados a esta O.S.</h3>
+                        <div id="wrapperAparelhosOS" class="space-y-3"></div>
+                        <button type="button" id="btnAdicionarAparelhoOS" onclick="adicionarCamposAparelhoForm()" class="mt-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow-sm">
+                            + Adicionar Outro Aparelho
+                        </button>
+                    </div>
+
+                    <div class="border-t pt-3 flex flex-col md:flex-row justify-between items-center bg-gray-50 p-3 rounded-xl">
+                        <div class="text-sm font-bold text-gray-700">
+                            Total Calculado da O.S.: <span id="totalRealTimeForm" class="text-lg text-blue-600 font-black ml-1">R$ 0,00</span>
+                        </div>
+                        <div class="text-right mt-2 md:mt-0 flex gap-2">
+                            <button type="button" id="btnCancelarOS" onclick="limparFormOS()" class="bg-gray-400 text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-500 transition hidden">
+                                Cancelar Edição
+                            </button>
+                            <button type="submit" id="btnGravarOS" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition shadow">
+                                Gravar Ordem de Serviço
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-x-auto border border-gray-100">
+                    <div class="p-3 bg-blue-50 text-xs font-semibold text-blue-700 italic">💡 Clique sobre o NOME DO CLIENTE abaixo para abrir o comprovante limpo para printar e enviar pelo WhatsApp!</div>
+                    <table class="w-full text-left border-collapse">
+                        
+<thead>
+    <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
+        <th class="p-3">Data</th> <!-- Data primeiro -->
+        <th class="p-3">Cliente</th> <!-- Nome depois -->
+        <th class="p-3">Aparelhos / Serviços</th>
+        <th class="p-3">Status</th>
+        <th class="p-3">Total Bruto</th>
+        <th class="p-3 text-center">Ações</th>
+    </tr>
+</thead>
+
+                        <tbody id="tabelaOS" class="divide-y divide-gray-100 text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="planilha" class="tab-content hidden space-y-6">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b pb-2">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Planilha de Desempenho & A伴奏 Gráfico</h2>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex items-center gap-1">
+                            <label class="text-[10px] font-bold text-gray-600 uppercase">De:</label>
+                            <input type="date" id="buscaPlanilhaDataInicio" onchange="atualizarPlanilhaFiltrada()" class="border p-1 rounded outline-none font-bold text-xs text-gray-700 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <label class="text-[10px] font-bold text-gray-600 uppercase">Até:</label>
+                            <input type="date" id="buscaPlanilhaDataFim" onchange="atualizarPlanilhaFiltrada()" class="border p-1 rounded outline-none font-bold text-xs text-gray-700 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-blue-600 text-white p-4 rounded-xl shadow-sm">
+        <p class="text-xs text-blue-200 font-bold uppercase">Total O.S. Feitas</p>
+        <p id="planilha-qtd-os" class="text-xl font-black">0</p>
+    </div>
+    <div class="bg-gray-800 text-white p-4 rounded-xl shadow-sm">
+        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento Bruto</p>
+        <p id="planilha-fat-dia" class="text-xl font-bold">R$ 0,00</p>
+    </div>
+    <div class="bg-gray-800 text-white p-4 rounded-xl shadow-sm">
+        <p class="text-xs text-gray-400 font-bold uppercase">Custo Peças</p>
+        <p id="planilha-custo-dia" class="text-xl font-bold text-red-400">R$ 0,00</p>
+    </div>
+    <div class="bg-emerald-700 text-white p-4 rounded-xl shadow-sm">
+        <p class="text-xs text-emerald-200 font-bold uppercase">Lucro Líquido</p>
+        <p id="planilha-lucro-dia" class="text-xl font-black">R$ 0,00</p>
+    </div>
+</div>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase">Desempenho Diário Recente (Últimos 7 Dias)</h3>
+                        <canvas id="chartDiario" class="w-full max-h-64"></canvas>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase">Desempenho Mensal Consolidado (Anual)</h3>
+                        <canvas id="chartMensal" class="w-full max-h-64"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Relatório Detalhado do Período Selecionado</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+    <tr class="bg-gray-100 border-b border-gray-300 font-bold text-gray-700 uppercase">
+        <th class="p-2">Data</th>
+        <th class="p-2">Cliente</th>
+        <th class="p-2">Aparelhos / Serviços / Obs</th>
+         
+        <th class="p-2">Mão de Obra</th>
+        <th class="p-2 text-red-500">Custo Peça</th>
+        <th class="p-2 font-bold">Total Bruto</th>
+        <th class="p-2 text-green-600">Lucro Real</th>
+    </tr>
+</thead>
+
+                            <tbody id="corpoPlanilhaGeral" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="relatorios" class="tab-content hidden space-y-6">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b pb-2">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-600">Relatório de Declaração Mensal</h2>
+                    </div>
+                    <div class="flex items-center gap-2 no-print">
+                        <label class="text-xs font-bold text-gray-600 uppercase">Mês:</label>
+                        <input type="month" id="filtroMesRelatorio" onchange="calcularRelatorioMensal()" class="border p-2 rounded font-bold">
+                        <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-black transition">
+                            Gerar PDF (Imprimir)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="relatorioParaImprimir" class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-8">
+                    <div class="border-b pb-4">
+                        <h3 class="text-2xl font-black text-gray-800">Relatório de Operações</h3>
+                        <p class="text-sm text-gray-500">Período de referência: <span id="mesReferencia" class="font-bold text-blue-600"></span></p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-xl border"><p class="text-xs text-gray-400 font-bold uppercase">Total de O.S.</p><p id="rm-total-os" class="text-xl font-bold">0</p></div>
+                        <div class="bg-gray-50 p-4 rounded-xl border"><p class="text-xs text-gray-400 font-bold uppercase">Entrada Bruta</p><p id="rm-faturamento" class="text-xl font-bold">R$ 0,00</p></div>
+                        <div class="bg-gray-50 p-4 rounded-xl border"><p class="text-xs text-gray-400 font-bold uppercase">Saída (Peças)</p><p id="rm-custo" class="text-xl font-bold text-red-600">R$ 0,00</p></div>
+                        <div class="bg-green-600 p-4 rounded-xl text-white"><p class="text-xs text-green-100 font-bold uppercase">Resultado Líquido</p><p id="rm-lucro" class="text-xl font-black">R$ 0,00</p></div>
+                    </div>
+
+                    <div class="pt-4">
+                        <h4 class="font-bold text-gray-700 mb-4 uppercase text-xs tracking-widest border-b pb-2">Extrato Detalhado de Serviços</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="bg-gray-100 text-gray-600">
+                                        <th class="p-3">Data</th>
+                                        <th class="p-3">Cliente</th>
+                                        <th class="p-3">Aparelhos / Serviços / Obs</th>
+                                        <th class="p-3 text-right">Mão de Obra</th>
+                                        <th class="p-3 text-right text-red-600">Peças</th>
+                                        <th class="p-3 text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpoRelatorioDetalhado" class="divide-y text-gray-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="garantias" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Prazos de Garantia Ativos (3 Meses)</h2>
+                <div class="p-3 bg-blue-50 text-xs font-semibold text-blue-800 rounded-lg">💡 Clique no nome de qualquer cliente abaixo para mapear e visualizar o seu histórico completo detalhado!</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="listaGarantias"></div>
+            </section>
+<section id="estoque" class="tab-content hidden space-y-6">
+    <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Gestão de Estoque & Peças</h2>
+    
+    <form id="pecaForm" onsubmit="salvarPeca(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input type="hidden" id="editPecaId" value="">
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Marca *</label>
+            <select id="pMarca" required class="w-full p-2 border rounded bg-white">
+                <option value="Samsung">Samsung</option>
+                <option value="Motorola">Motorola</option>
+                <option value="Infinix">Infinix</option>
+                <option value="Iphone">Iphone</option>
+                <option value="Realme">Realme</option>
+                <option value="Xiaomi">Xiaomi</option>
+                <option value="LG">LG</option>
+            </select>
+        </div>
+        <div><div>
+    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Modelo *</label>
+    <input type="text" id="pModelo" required placeholder="Ex: Galaxy A32, Moto G60" class="w-full p-2 border rounded">
+</div>
+
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Peça *</label>
+          
+<select id="pNome" required class="w-full p-2 border rounded bg-white">
+    <option value="Tela Original c/ Aro">Tela Original c/ Aro</option>
+    <option value="Tela Paralela c/ Aro">Tela Paralela c/ Aro</option>
+    <option value="Tela Paralela">Tela Paralela</option>
+    <option value="Tela Original">Tela Original</option>
+    <option value="Conector de carga">Conector de carga</option>
+    <option value="Pelicula">Pelicula</option>
+    <option value="Bateria">Bateria</option>
+    <option value="Flex">Flex</option>
+    <option value="Alto falante">Alto falante</option>
+    <option value="Camera">Camera</option>
+    <option value="Lente camera">Lente camera</option>
+    <option value="Carcaca">Carcaca</option>
+    <option value="Tampa traseira">Tampa traseira</option>
+</select>
+
+
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Distribuidora</label>
+            <input type="text" id="pDist" placeholder="Ex: Mercado Livre/Loja X" class="w-full p-2 border rounded">
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor (R$)</label>
+            <input type="number" step="0.01" id="pValor" required class="w-full p-2 border rounded">
+        </div>
+        <div class="md:col-span-2 flex items-end">
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">Salvar Peça no Estoque</button>
+        </div>
+    </form>
+
+    <<div class="space-y-4">
+   <div class="flex flex-wrap gap-2" id="filtrosEstoque">
+    <button onclick="renderizarEstoque('todos')" class="bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-bold">Todos</button>
+    
+    <!-- Filtros de Marca -->
+    <span class="text-xs font-bold text-gray-400 self-center border-l pl-2">MARCAS:</span>
+    <button onclick="renderizarEstoque('Samsung')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Samsung</button>
+    <button onclick="renderizarEstoque('Motorola')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Motorola</button>
+    <button onclick="renderizarEstoque('Infinix')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Infinix</button>
+    <button onclick="renderizarEstoque('Iphone')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Iphone</button>
+    <button onclick="renderizarEstoque('Realme')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Realme</button>
+    <button onclick="renderizarEstoque('Xiaomi')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Xiaomi</button>
+    <button onclick="renderizarEstoque('LG')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">LG</button>
+    
+<!-- Filtros de Peças -->
+<span class="text-xs font-bold text-gray-400 self-center border-l pl-2">PEÇAS:</span>
+<button onclick="renderizarEstoque('Tela Original c/ Aro')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Original c/ Aro</button>
+<button onclick="renderizarEstoque('Tela Paralela c/ Aro')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Paralela c/ Aro</button>
+<button onclick="renderizarEstoque('Tela Paralela')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Tela Paralela</button>
+<button onclick="renderizarEstoque('Tela Original')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Tela Original</button>
+<button onclick="renderizarEstoque('Conector de carga')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Conector</button>
+
+
+    <button onclick="renderizarEstoque('Tela')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Tela</button>
+    <button onclick="renderizarEstoque('Conector de carga')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Conector</button>
+    <button onclick="renderizarEstoque('Pelicula')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Pelicula</button>
+    <button onclick="renderizarEstoque('Bateria')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Bateria</button>
+    <button onclick="renderizarEstoque('Flex')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Flex</button>
+    <button onclick="renderizarEstoque('Alto falante')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Alto falante</button>
+    <button onclick="renderizarEstoque('Camera')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Camera</button>
+    <button onclick="renderizarEstoque('Lente camera')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Lente camera</button>
+    <button onclick="renderizarEstoque('Carcaca')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Carcaca</button>
+    <button onclick="renderizarEstoque('Tampa traseira')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Tampa traseira</button>
+<div class="mb-4">
+    <input type="text" id="inputBuscaEstoque" onkeyup="renderizarEstoque('todos')" 
+           placeholder="🔍 Buscar pelo modelo (Ex: A32, Moto G60)..." 
+           class="w-full p-3 border rounded-xl shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
+</div>
+
+<table class="w-full text-left">
+    <thead class="bg-gray-100 text-xs uppercase">
+    <tr>
+        <th class="p-3">Marca</th>
+        <th class="p-3">Modelo</th> 
+        <th class="p-3">Peça</th>
+        <th class="p-3">Dist.</th>
+        <th class="p-3">Custo</th> <th class="p-3">Sugestão Reparo</th> <th class="p-3">Ações</th>
+    </tr>
+</thead>
+
+    <tbody id="tabelaEstoque" class="divide-y"></tbody>
+</table>
+
+    </div>
+</section>
+
+        </div>
+    </div>
+<div id="modalHistoricoRapido" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 id="tituloModalHistorico" class="text-lg font-bold text-blue-600">Histórico do Cliente</h3>
+            <button onclick="fecharModalHistorico()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">✕</button>
+        </div>
+        <div id="corpoModalHistorico" class="p-4 overflow-y-auto space-y-3">
+            </div>
+    </div>
+</div>
+
+    <div id="modalPrintCliente" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border-2 border-blue-500 flex flex-col">
+            <div id="areaDoPrint" class="bg-white p-6 space-y-4 text-gray-800">
+                <div class="flex items-center gap-3 border-b pb-3">
+                    <div class="w-14 h-14 bg-slate-900 rounded-xl flex items-center justify-center p-1 border border-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="w-full h-full">
+                            <rect x="50" y="20" width="140" height="200" rx="20" fill="#1e293b" stroke="#ffffff" stroke-width="6"/>
+                            <text x="120" y="125" font-family="Arial, sans-serif" font-weight="900" font-size="36" fill="#ffffff" text-anchor="middle">JV</text>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-black text-blue-600 tracking-wide">JV CELL</h3>
+                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Assistência Técnica Especializada</p>
+                        <p class="text-[11px] text-slate-700 font-semibold mt-0.5">📞 Whats: (19) 98243-2381</p>
+                        <p class="text-[10px] text-slate-500">📍 Jd. Amanda, Hortolândia - SP</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2 text-sm">
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase block">Dados do Cliente</span>
+                        <p id="printNome" class="font-bold text-slate-900 text-base"></p>
+                        <p id="printClienteContato" class="text-xs text-slate-600 font-medium"></p>
+                        <p id="printClienteEndereco" class="text-[11px] text-slate-500 italic"></p>
+                    </div>
+                    
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase block">Data de Registro</span>
+                        <p id="printData" class="font-semibold text-slate-800"></p>
+                    </div>
+
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                        <span class="text-[10px] text-gray-400 font-bold uppercase block">Lista de Dispositivos e Serviços</span>
+                        <div id="printAparelhosContainer" class="divide-y divide-gray-200 mt-1 max-h-40 overflow-y-auto"></div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-600 text-white p-3 rounded-xl text-center space-y-0.5 shadow-md">
+                    <span class="text-xs text-blue-100 font-medium uppercase tracking-wider">Valor Total da O.S.</span>
+                    <h2 id="printTotal" class="text-2xl font-black">R$ 0,00</h2>
+                    <div class="inline-block bg-white/20 px-2 py-0.5 rounded text-[10px] font-bold mt-0.5 uppercase" id="printStatus"></div>
+                </div>
+
+                <div class="text-[9px] text-gray-400 italic space-y-0.5 border-t pt-2">
+                    <p class="font-bold text-gray-500">🔒 Termos de Garantia JV CELL:</p>
+                    <p>• Cobertura padrão de 3 meses (90 dias) exclusiva sobre o componente reparado.</p>
+                    <p>• Telas quebradas, marcas de queda, pressões físicas ou contato com líquidos invalidam a garantia.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-100 p-3 flex gap-2 border-t">
+                <button onclick="fecharModalPrint()" class="w-full bg-slate-800 text-white py-2 rounded-xl text-xs font-bold hover:bg-black transition">
+                    Fechar Janela
+              </button>
+        </div>
+        <div id="corpoModalHistorico" class="p-4 overflow-y-auto space-y-3">
+            </div>
+    </div>
+</div>
+ </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let bancoClientes = JSON.parse(localStorage.getItem('jvcell_clientes')) || [];
+        let bancoOS = JSON.parse(localStorage.getItem('jvcell_os')) || [];
+        let bancoUsuarios = JSON.parse(localStorage.getItem('jvcell_usuarios')) || [];
+
+        const hojeIso = new Date().toISOString().split('T')[0];
+        document.getElementById('osData').value = hojeIso;
+        document.getElementById('buscaPlanilhaDataInicio').value = hojeIso;
+        document.getElementById('buscaPlanilhaDataFim').value = hojeIso;
+        document.getElementById('filtroMesRelatorio').value = hojeIso.substring(0, 7);
+
+        window.onload = function() {
+            const savedUser = localStorage.getItem('jvcell_remember_user');
+            const savedPass = localStorage.getItem('jvcell_remember_pass');
+            if(savedUser && savedPass) {
+                document.getElementById('loginUser').value = savedUser;
+                document.getElementById('loginPassword').value = savedPass;
+                document.getElementById('rememberMe').checked = true;
+            }
+            limparFormOS();
+        };
+        
+
+function fecharModalHistorico() {
+    document.getElementById('modalHistoricoRapido').classList.add('hidden');
+}
+
+
+        function toggleMenu() {
+            const menu = document.getElementById('navContainer');
+            menu.classList.toggle('hidden');
+        }
+
+        function alternarAbasAuth(aba) {
+            const loginForm = document.getElementById('loginForm');
+            const cadastroForm = document.getElementById('cadastroForm');
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+
+            if (aba === 'cadastro') {
+                loginForm.classList.add('hidden');
+                cadastroForm.classList.remove('hidden');
+                title.innerText = "Nova Conta";
+                subtitle.innerText = "Crie seu acesso para o painel da JV CELL";
+            } else {
+                cadastroForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                title.innerText = "JV CELL";
+                subtitle.innerText = "Gerenciamento Fiscal & Operacional";
+            }
+        }
+
+        function criarNovaConta(e) {
+            e.preventDefault();
+            const nome = document.getElementById('cadName').value.trim();
+            const email = document.getElementById('cadUser').value.trim().toLowerCase();
+            const senha = document.getElementById('cadPassword').value;
+
+            const usuarioExiste = bancoUsuarios.some(u => u.email === email) || email === "jvcell@gmail.com";
+            if (usuarioExiste) {
+                alert("Este e-mail já está cadastrado no sistema!");
+                return;
+            }
+
+            const novoUsuario = { nome, email, senha };
+            bancoUsuarios.push(novoUsuario);
+            localStorage.setItem('jvcell_usuarios', JSON.stringify(bancoUsuarios));
+
+            document.getElementById('cadastroForm').reset();
+            const sucessoBox = document.getElementById('cadSucesso');
+            sucessoBox.classList.remove('hidden');
+            setTimeout(() => sucessoBox.classList.add('hidden'), 4000);
+
+            alternarAbasAuth('login');
+            document.getElementById('loginUser').value = email;
+        }
+
+        async function autenticar(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('loginUser').value.trim().toLowerCase();
+            const senha = document.getElementById('loginPassword').value;
+            const remember = document.getElementById('rememberMe').checked;
+
+            const loginValidoMaster = (usuario === "jvcell@gmail.com" && senha === "Aylla2605.");
+            const loginValidoAdicional = bancoUsuarios.find(u => u.email === usuario && u.senha === senha);
+
+            if (loginValidoMaster || loginValidoAdicional) {
+                if(remember) {
+                    localStorage.setItem('jvcell_remember_user', usuario);
+                    localStorage.setItem('jvcell_remember_pass', senha);
+                } else {
+                    localStorage.removeItem('jvcell_remember_user');
+                    localStorage.removeItem('jvcell_remember_pass');
+                }
+                
+                // Força puxar do Firebase logo no Login para sincronizar múltiplos aparelhos
+                try {
+                    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                    const docRef = doc(window.db, "sistema", "dados_globais");
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const dadosNuvem = docSnap.data();
+                        bancoClientes = dadosNuvem.clientes || [];
+                        bancoOS = dadosNuvem.os || [];
+                        bancoPecas = dadosNuvem.pecas || []
+                        localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
+                        localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+                        
+                        localStorage.setItem('jvcell_pecas', JSON.stringify(bancoPecas));
+                        console.log("Sincronização Online efetuada no Login.");
+                    }
+                } catch (error) {
+                    console.error("Erro ao sincronizar dados no login (Usando caches locais):", error);
+                    bancoClientes = JSON.parse(localStorage.getItem('jvcell_clientes')) || [];
+                    bancoOS = JSON.parse(localStorage.getItem('jvcell_os')) || [];
+                }
+
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainSystem').classList.remove('hidden');
+                sincronizarTudo();
+            } else {
+                const erroBox = document.getElementById('loginErro');
+                erroBox.classList.remove('hidden');
+                setTimeout(() => erroBox.classList.add('hidden'), 3000);
+            }
+        }
+
+        // SALVA DIRETAMENTE NO FIREBASE PARA ENVIAR AOS OUTROS DISPOSITIVOS
+        async function salvarNaNuvem() {
+    try {
+        const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+        await setDoc(doc(window.db, "sistema", "dados_globais"), {
+            clientes: bancoClientes,
+            os: bancoOS,
+            pecas: bancoPecas, // ADICIONE ESTA LINHA
+            ultimaAtualizacao: new Date().toISOString()
+        });
+        console.log("Nuvem atualizada (incluindo estoque)!");
+    } catch (error) {
+        console.error("Falha ao salvar na nuvem:", error);
+    }
+}
+
+
+        function deslogar() {
+            document.getElementById('loginPassword').value = localStorage.getItem('jvcell_remember_pass') || '';
+            document.getElementById('mainSystem').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            alternarAbasAuth('login');
+        }
+
+        // Sincroniza os dados antes de abrir qualquer aba nova
+        async function showSection(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-800', 'bg-amber-600', 'bg-amber-700'));
+            
+            document.getElementById(id).classList.remove('hidden');
+            
+            const btnFoco = document.getElementById(`btn-nav-${id}`);
+            if(btnFoco) {
+                if(id === 'historicoClientes') {
+                    btnFoco.classList.add('bg-amber-700');
+                } else {
+                    btnFoco.classList.add('bg-blue-800');
+                }
+            }
+
+            if (window.innerWidth < 1024) {
+                document.getElementById('navContainer').classList.add('hidden');
+            }
+
+            // Tenta obter atualizações em tempo real da nuvem ao navegar pelas abas
+            try {
+                const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                const docSnap = await getDoc(doc(window.db, "sistema", "dados_globais"));
+                if (docSnap.exists()) {
+                    const dados = docSnap.data();
+                    bancoClientes = dados.clientes || [];
+                    bancoOS = dados.os || [];
+                    localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
+                    localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+                }
+            } catch (e) { console.log("Abas carregadas no modo offline."); }
+
+            sincronizarTudo();
+        }
+
+        function sincronizarTudo() {
+            renderizarOrcamentos()
+            padronizarBancoOS();
+            atualizarResumosHome();
+            renderizarClientes();
+            atualizarSelectClientes();
+            atualizarSelectFiltroHistorico();
+            renderizarOS();
+            atualizarPlanilhaFiltrada();
+            calcularRelatorioMensal();
+            listarGarantias();
+        }
+function renderizarOrcamentos() {
+    const tbody = document.getElementById('tabelaOrcamentos');
+    tbody.innerHTML = '';
+    
+    // Filtra para mostrar o que NÃO foi Realizado (ou seja: Orçamento e Aprovado)
+    const orcamentos = bancoOS.filter(o => o.status === 'Orçamento' || o.status === 'Aprovado');
+    
+    if (orcamentos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum orçamento ou O.S. aprovada pendente.</td></tr>';
+        return;
+    }
+    
+    orcamentos.forEach(o => {
+        let aparelhos = o.aparelhos.map(ap => ap.aparelho).join(', ');
+        
+        // Define a cor de fundo baseado no status para ficar visualmente fácil de distinguir
+        const bgRow = o.status === 'Aprovado' ? 'bg-blue-50' : 'bg-amber-50';
+        
+        tbody.innerHTML += `
+            <tr class="${bgRow} hover:opacity-90">
+                <td class="p-3 font-bold">${o.cliente}</td>
+                <td class="p-3 text-xs">${aparelhos}</td>
+                <td class="p-3 text-xs">${o.data.split('-').reverse().join('/')}</td>
+                <td class="p-3 text-center">
+                    <select onchange="mudarStatusDiretoDaTabela(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-bold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Orçamento" ${o.status === 'Orçamento' ? 'selected' : ''}>Orçamento</option>
+                        <option value="Aprovado" ${o.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
+                        <option value="Realizado">Finalizar (Realizado)</option>
+                    </select>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+
+// Nova função auxiliar para processar a mudança
+function mudarStatusDiretoDaTabela(id, novoStatus) {
+    mudarStatus(id, novoStatus); // Reutiliza sua função original de mudança de status
+    alert("Status atualizado com sucesso!");
+    sincronizarTudo(); // Atualiza todas as abas e remove da tabela de orçamentos
+}
+
+
+        function padronizarBancoOS() {
+            let modificado = false;
+            bancoOS = bancoOS.map(o => {
+                if (!o.aparelhos || !Array.isArray(o.aparelhos)) {
+                    o.aparelhos = [{
+                        id: Date.now() + Math.random(),
+                        marca: 'Samsung',
+                        aparelho: o.aparelho || 'Não informado',
+                        servico: o.servico || 'Não informado',
+                        observacao: o.observacao || '',
+                        maoObra: parseFloat(o.maoObra) || 0,
+                        peca: parseFloat(o.peca) || 0
+                    }];
+                    delete o.aparelho;
+                    delete o.servico;
+                    delete o.observacao;
+                    delete o.maoObra;
+                    delete o.peca;
+                    modificado = true;
+                } else {
+                    o.aparelhos = o.aparelhos.map(ap => {
+                        if (ap.observacao === undefined) ap.observacao = '';
+                        if (!ap.marca) {
+                            ap.marca = 'Samsung';
+                            modificado = true;
+                        }
+                        return ap;
+                    });
+                }
+                return o;
+            });
+            if (modificado) {
+                localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+                salvarNaNuvem();
+            }
+        }
+
+        function limparFormOS() {
+            document.getElementById('editOSId').value = "";
+            document.getElementById('osForm').reset();
+            document.getElementById('osData').value = hojeIso;
+            
+            const wrapper = document.getElementById('wrapperAparelhosOS');
+            wrapper.innerHTML = '';
+            
+            document.getElementById('tituloFormOS').innerText = "Entrada de Ordens de Serviço (O.S.)";
+            document.getElementById('btnGravarOS').innerText = "Gravar Ordem de Serviço";
+            document.getElementById('btnCancelarOS').classList.add('hidden');
+            
+            adicionarCamposAparelhoForm();
+            calcularTotalFormOS();
+        }
+
+        function adicionarCamposAparelhoForm(valAparelho = '', valServico = '', valMao = '0.00', valPeca = '0.00', valObs = '', valMarca = 'Samsung') {
+            const wrapper = document.getElementById('wrapperAparelhosOS');
+            const uid = Date.now() + Math.random().toString(36).substr(2, 5);
+
+            const div = document.createElement('div');
+            div.id = `aparelhoBlock_${uid}`;
+            div.className = "aparelho-row bg-gray-50 p-3 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-4 gap-3 relative pt-7 md:pt-3";
+            div.innerHTML = `
+                <button type="button" onclick="removerCampoAparelhoForm('${uid}')" class="absolute top-1.5 right-2 text-xs font-bold text-red-500 hover:text-red-700 md:top-2">Remover X</button>
+                <div class="md:col-span-1 grid grid-cols-2 gap-1.5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-0.5">Marca *</label>
+                        <select class="input-aparelho-marca w-full p-1.5 border rounded text-xs outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <option value="Samsung" ${valMarca === 'Samsung' ? 'selected' : ''}>Samsung</option>
+                            <option value="iPhone" ${valMarca === 'iPhone' ? 'selected' : ''}>iPhone</option>
+                            <option value="Motorola" ${valMarca === 'Motorola' ? 'selected' : ''}>Motorola</option>
+                            <option value="Redmi" ${valMarca === 'Redmi' ? 'selected' : ''}>Xiaomi Redmi</option>
+                            <option value="Realme" ${valMarca === 'Realme' ? 'selected' : ''}>Realme</option>
+                            <option value="LG" ${valMarca === 'LG' ? 'selected' : ''}>LG</option>
+                            <option value="TCL" ${valMarca === 'TCL' ? 'selected' : ''}>TCL</option>
+                            <option value="ASUS" ${valMarca === 'ASUS' ? 'selected' : ''}>ASUS</option>
+                            <option value="Infinix" ${valMarca === 'Infinix' ? 'selected' : ''}>Infinix</option>
+                            <option value="Positivo" ${valMarca === 'Positivo' ? 'selected' : ''}>Positivo</option>
+                            <option value="Outra" ${valMarca === 'Outra' ? 'selected' : ''}>Outra</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-0.5">Modelo *</label>
+                        <input type="text" placeholder="Ex: A32 / 13 Pro" value="${valAparelho}" required class="input-aparelho-nome w-full p-1.5 border rounded text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-0.5">Serviço Realizado *</label>
+                    <select class="input-aparelho-servico w-full p-1.5 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        <option value="Troca de Tela" ${valServico === 'Troca de Tela' ? 'selected' : ''}>Troca de Tela</option>
+                        <option value="Troca de Flex" ${valServico === 'Troca de Flex' ? 'selected' : ''}>Troca de Flex</option>
+                        <option value="Troca de Botão" ${valServico === 'Troca de Botão' ? 'selected' : ''}>Troca de Botão</option>
+                        <option value="Troca de Carcaça" ${valServico === 'Troca de Carcaça' ? 'selected' : ''}>Troca de Carcaça</option>
+                        <option value="Troca de Conector de Carga" ${valServico === 'Troca de Conector de Carga' ? 'selected' : ''}>Troca de Conector de Carga</option>
+                        <option value="Troca de Bateria" ${valServico === 'Troca de Bateria' ? 'selected' : ''}>Troca de Bateria</option>
+                        <option value="Reparo em Placa" ${valServico === 'Reparo em Placa' ? 'selected' : ''}>Reparo em Placa</option>
+                        <option value="Limpeza / Desoxidação" ${valServico === 'Limpeza / Desoxidação' ? 'selected' : ''}>Limpeza / Desoxidação</option>
+                        <option value="Formatação / Software" ${valServico === 'Formatação / Software' ? 'selected' : ''}>Formatação / Software</option>
+                        <option value="Desbloqueio conta google" ${valServico === 'Desbloqueio conta google' ? 'selected' : ''}>Desbloqueio conta google</option>
+                        <option value="Desbloqueio financeiro" ${valServico === 'Desbloqueio financeiro' ? 'selected' : ''}>Desbloqueio financeiro</option>
+                        <option value="Troca de câmera" ${valServico === 'Troca de câmera' ? 'selected' : ''}>Troca de câmera</option>
+                        <option value="Troca tampa traseira" ${valServico === 'Troca tampa traseira' ? 'selected' : ''}>Troca tampa traseira</option>
+                        <option value="Troca alto falante" ${valServico === 'Troca alto falante' ? 'selected' : ''}>Troca alto falante</option>
+                        <option value="Troca componentes" ${valServico === 'Troca componentes' ? 'selected' : ''}>Troca componentes</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-0.5">Mão de Obra (R$)</label>
+                    <input type="number" step="0.01" value="${valMao}" oninput="calcularTotalFormOS()" class="input-aparelho-mao w-full p-1.5 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-0.5">Valor Peças (R$)</label>
+                    <input type="number" step="0.01" value="${valPeca}" oninput="calcularTotalFormOS()" class="input-aparelho-peca w-full p-1.5 border rounded text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="md:col-span-4 mt-1">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-0.5">Observação do Aparelho</label>
+                    <textarea placeholder="Ex: Riscos na tampa, aparelho já veio sem os parafusos de baixo, detalhes adicionais..." class="input-aparelho-obs w-full p-1.5 border rounded text-xs outline-none focus:ring-2 focus:ring-blue-500" rows="2">${valObs}</textarea>
+                </div>
+            `;
+            wrapper.appendChild(div);
+            calcularTotalFormOS();
+        }
+
+        function removerCampoAparelhoForm(uid) {
+            const rows = document.querySelectorAll('.aparelho-row');
+            if(rows.length <= 1) {
+                alert('A Ordem de Serviço precisa conter ao menos um dispositivo!');
+                return;
+            }
+            const el = document.getElementById(`aparelhoBlock_${uid}`);
+            if(el) el.remove();
+            calcularTotalFormOS();
+        }
+
+        function calcularTotalFormOS() {
+            const rows = document.querySelectorAll('.aparelho-row');
+            let total = 0;
+            rows.forEach(row => {
+                const mao = parseFloat(row.querySelector('.input-aparelho-mao').value) || 0;
+                const peca = parseFloat(row.querySelector('.input-aparelho-peca').value) || 0;
+                total += (mao + peca);
+            });
+            document.getElementById('totalRealTimeForm').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+       function salvarCliente(e) {
+    e.preventDefault();
+    const idEdicao = document.getElementById('editClienteId').value;
+    const nomeInformado = document.getElementById('cNome').value.trim();
+    const telefoneInformado = document.getElementById('cTelefone').value.trim();
+    const ruaInformada = document.getElementById('cRua').value.trim();
+    const cidadeInformada = document.getElementById('cCidade').value.trim();
+
+    if (idEdicao) {
+        // Lógica de Edição
+        bancoClientes = bancoClientes.map(c => {
+            if (c.id == idEdicao) {
+                // Atualiza O.S. vinculadas caso o nome do cliente mude
+                if (c.nome.toLowerCase() !== nomeInformado.toLowerCase()) {
+                    bancoOS = bancoOS.map(o => {
+                        if (o.cliente.toLowerCase() === c.nome.toLowerCase()) {
+                            o.cliente = nomeInformado;
+                            o.telefone = telefoneInformado;
+                        }
+                        return o;
+                    });
+                }
+                return { ...c, nome: nomeInformado, telefone: telefoneInformado, rua: ruaInformada, cidade: cidadeInformada };
+            }
+            return c;
+        });
+        alert('Ficha do cliente atualizada com sucesso!');
+    } else {
+        // Lógica de Novo Cadastro
+        const novo = {
+            id: Date.now(),
+            nome: nomeInformado,
+            telefone: telefoneInformado,
+            rua: ruaInformada,
+            cidade: cidadeInformada
+        };
+        bancoClientes.push(novo);
+        
+        // Mensagem de sucesso para novo cadastro
+        alert(`Sucesso! O cliente ${nomeInformado} foi cadastrado com sucesso.`);
+    }
+
+    // Persistência
+    localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
+    localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+    
+    // Sincroniza e reseta o formulário
+    salvarNaNuvem();
+    cancelarEdicaoCliente(); 
+    sincronizarTudo(); // Garante que a tabela seja redesenhada imediatamente
+}
+
+
+        function prepararEdicaoCliente(id) {
+            const cliente = bancoClientes.find(c => c.id == id);
+            if(!cliente) return;
+
+            document.getElementById('editClienteId').value = cliente.id;
+            document.getElementById('cNome').value = cliente.nome;
+            document.getElementById('cTelefone').value = cliente.telefone;
+            document.getElementById('cRua').value = cliente.rua || '';
+            document.getElementById('cCidade').value = cliente.cidade || '';
+
+            document.getElementById('btnSalvarCliente').innerText = "Atualizar Ficha";
+            document.getElementById('btnSalvarCliente').classList.replace('bg-green-600', 'bg-blue-600');
+            document.getElementById('btnSalvarCliente').classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+            document.getElementById('btnCancelarEdicao').classList.remove('hidden');
+
+            document.getElementById('clienteForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoCliente() {
+            document.getElementById('editClienteId').value = "";
+            document.getElementById('clienteForm').reset();
+
+            document.getElementById('btnSalvarCliente').innerText = "Salvar Ficha do Cliente";
+            document.getElementById('btnSalvarCliente').classList.replace('bg-blue-600', 'bg-green-600');
+            document.getElementById('btnSalvarCliente').classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            document.getElementById('btnCancelarEdicao').classList.add('hidden');
+        }
+
+        function deletarCliente(id) {
+            if(confirm('Excluir este cliente do banco de dados?')) {
+                bancoClientes = bancoClientes.filter(c => c.id !== id);
+                localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
+                salvarNaNuvem();
+                sincronizarTudo();
+            }
+        }
+
+        function renderizarClientes() {
+            const tbody = document.getElementById('tabelaClientes');
+            tbody.innerHTML = '';
+            bancoClientes.forEach(c => {
+                const rua = c.rua || 'Sem endereço';
+                const cidade = c.cidade || '';
+                const enderecoCompleto = cidade ? `${rua} - ${cidade}` : rua;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3">
+                            <span class="font-bold text-blue-600 cursor-pointer underline decoration-dotted block" onclick="abrirModalHistorico('${c.nome}')">${c.nome}</span>
+                            <span class="text-xs text-gray-400 block mt-0.5">${enderecoCompleto}</span>
+                        </td>
+                        <td class="p-3 text-gray-600 font-medium">${c.telefone}</td>
+                        <td class="p-3 text-center flex justify-center gap-1.5 pt-4">
+                            <button onclick="prepararEdicaoCliente(${c.id})" class="text-xs bg-blue-100 text-blue-600 font-bold px-2.5 py-1 rounded hover:bg-blue-200 transition">Editar</button>
+                            <button onclick="deletarCliente(${c.id})" class="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded hover:bg-red-200 transition">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function atalhoVerHistorico(nomeCliente) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-800', 'bg-amber-600', 'bg-amber-700'));
+            
+            document.getElementById('historicoClientes').classList.remove('hidden');
+            const btnHist = document.getElementById('btn-nav-historicoClientes');
+            if(btnHist) btnHist.classList.add('bg-amber-700');
+            
+            document.getElementById('selectFiltroHistorico').value = nomeCliente;
+            renderizarHistoricoEspecifico(nomeCliente);
+        }
+
+        function atualizarSelectClientes() {
+            const select = document.getElementById('osCliente');
+            select.innerHTML = '<option value="">-- Escolha o Cliente --</option>';
+            bancoClientes.forEach(c => {
+                select.innerHTML += `<option value="${c.nome}" data-tel="${c.telefone}">${c.nome}</option>`;
+            });
+        }
+
+        function atualizarSelectFiltroHistorico() {
+            const select = document.getElementById('selectFiltroHistorico');
+            const valorAtual = select.value;
+            select.innerHTML = '<option value="">-- Selecione o Cliente para filtrar --</option>';
+            bancoClientes.forEach(c => {
+                select.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+            });
+            if(valorAtual) select.value = valorAtual;
+        }
+
+        function renderizarHistoricoEspecifico(nomeCliente) {
+            const wrapperHistorico = document.getElementById('cronologiaServicos');
+            wrapperHistorico.innerHTML = '';
+
+            if(!nomeCliente) {
+                wrapperHistorico.innerHTML = '<p class="text-sm text-gray-400 italic">Por favor, selecione um cliente no menu acima para mapear o histórico.</p>';
+                return;
+            }
+
+            const servicosDoCliente = bancoOS.filter(o => o.cliente.toLowerCase() === nomeCliente.toLowerCase());
+
+            if(servicosDoCliente.length === 0) {
+                wrapperHistorico.innerHTML = `<p class="text-sm text-amber-600 font-medium">Nenhuma Ordem de Serviço foi registrada para <strong>${nomeCliente}</strong> até o momento.</p>`;
+                return;
+            }
+
+            servicosDoCliente.sort((a,b) => new Date(b.data) - new Date(a.data));
+
+            servicosDoCliente.forEach(o => {
+                let totalBruto = 0;
+                let listaTextoAparelhos = o.aparelhos.map(ap => {
+                    totalBruto += (ap.maoObra + ap.peca);
+                    let obsTexto = ap.observacao ? ` <span class="text-xs text-amber-600 italic block">Obs: ${ap.observacao}</span>` : '';
+                    let marcaTxt = ap.marca && ap.marca !== 'Outra' ? ap.marca + ' ' : '';
+                    return `<div class="mb-1"><span class="font-bold text-slate-800">${marcaTxt}${ap.aparelho}</span> (${ap.servico})${obsTexto}</div>`;
+                }).join('');
+
+                let badgeColor = o.status === 'Realizado' ? 'bg-green-100 text-green-800' : (o.status === 'Aprovado' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800');
+                let exibirNF = o.notaFiscal ? `<div class="text-xs text-slate-500 font-semibold mt-1">Nota Fiscal associada: <span class="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">#${o.notaFiscal}</span></div>` : '';
+                
+                wrapperHistorico.innerHTML += `
+                    <div class="p-4 border border-gray-100 rounded-xl bg-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-sm transition">
+                        <div class="space-y-1 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-gray-400">${o.data.split('-').reverse().join('/')}</span>
+                                <span class="px-2 py-0.5 text-[10px] font-black rounded uppercase ${badgeColor}">${o.status}</span>
+                            </div>
+                            <div class="text-sm text-gray-700 mt-1">${listaTextoAparelhos}</div>
+                            ${exibirNF}
+                        </div>
+                        <div class="flex items-center gap-3 self-end md:self-center shrink-0">
+                            <div class="text-right">
+                                <span class="text-[10px] text-gray-400 block font-bold uppercase">Preço Global O.S.</span>
+                                <span class="font-extrabold text-slate-800 text-base">R$ ${totalBruto.toFixed(2)}</span>
+                            </div>
+                            <button onclick="abrirComprovanteParaPrint(${o.id})" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow-sm transition">
+                                Ver Recibo (Print)
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function prepararEdicaoOS(id) {
+            const os = bancoOS.find(o => o.id === id);
+            if (!os) return;
+
+            document.getElementById('editOSId').value = os.id;
+            document.getElementById('osCliente').value = os.cliente;
+            document.getElementById('osStatus').value = os.status;
+            document.getElementById('osData').value = os.data;
+
+            const wrapper = document.getElementById('wrapperAparelhosOS');
+            wrapper.innerHTML = '';
+
+            os.aparelhos.forEach(ap => {
+                adicionarCamposAparelhoForm(ap.aparelho, ap.servico, ap.maoObra, ap.peca, ap.observacao || '', ap.marca || 'Samsung');
+            });
+
+            document.getElementById('tituloFormOS').innerText = "Editando Ordem de Serviço";
+            document.getElementById('btnGravarOS').innerText = "Atualizar Ordem de Serviço";
+            document.getElementById('btnCancelarOS').classList.remove('hidden');
+
+            document.getElementById('osForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function salvarOS(e) {
+            e.preventDefault();
+            const idEdicao = document.getElementById('editOSId').value;
+            const selectEl = document.getElementById('osCliente');
+            const tel = selectEl.options[selectEl.selectedIndex].getAttribute('data-tel') || '';
+            
+            const listaAparelhosColetados = [];
+            const rows = document.querySelectorAll('.aparelho-row');
+            
+            rows.forEach(row => {
+                listaAparelhosColetados.push({
+                    id: Date.now() + Math.random(),
+                    marca: row.querySelector('.input-aparelho-marca').value,
+                    aparelho: row.querySelector('.input-aparelho-nome').value.trim(),
+                    servico: row.querySelector('.input-aparelho-servico').value,
+                    observacao: row.querySelector('.input-aparelho-obs').value.trim(),
+                    maoObra: parseFloat(row.querySelector('.input-aparelho-mao').value) || 0,
+                    peca: parseFloat(row.querySelector('.input-aparelho-peca').value) || 0
+                });
+            });
+
+            if (idEdicao) {
+                bancoOS = bancoOS.map(o => {
+                    if (o.id == idEdicao) {
+                        o.cliente = selectEl.value;
+                        o.telefone = tel;
+                        o.status = document.getElementById('osStatus').value;
+                        o.data = document.getElementById('osData').value;
+                        o.aparelhos = listaAparelhosColetados;
+                    }
+                    return o;
+                });
+                alert('Ordem de Serviço atualizada com sucesso!');
+            } else {
+                const novaOS = {
+                    id: Date.now(),
+                    cliente: selectEl.value,
+                    telefone: tel,
+                    status: document.getElementById('osStatus').value,
+                    data: document.getElementById('osData').value,
+                    notaFiscal: "", 
+                    aparelhos: listaAparelhosColetados
+                };
+                bancoOS.push(novaOS);
+                alert('Ordem de Serviço gravada com sucesso!');
+            }
+
+            localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+            
+            // Dispara salvamento imediato na nuvem
+            salvarNaNuvem();
+            limparFormOS();
+            sincronizarTudo();
+        }
+
+        function deletarOS(id) {
+            if(confirm('Excluir esta Ordem de Serviço permanentemente?')) {
+                bancoOS = bancoOS.filter(o => o.id !== id);
+                localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+                salvarNaNuvem();
+                sincronizarTudo();
+            }
+        }
+
+        function mudarStatus(id, novoStatus) {
+            bancoOS = bancoOS.map(o => {
+                if(o.id === id) o.status = novoStatus;
+                return o;
+            });
+            localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+            
+            // Dispara salvamento imediato na nuvem
+            salvarNaNuvem();
+            sincronizarTudo();
+        }
+
+       function renderizarOS() {
+    const tbody = document.getElementById('tabelaOS');
+    tbody.innerHTML = '';
+
+    // Ordena o banco do mais recente para o mais antigo automaticamente
+    const listaOrdenada = [...bancoOS].sort((a, b) => new Date(b.data) - new Date(a.data));
+
+    listaOrdenada.forEach(o => {
+        let totalOS = 0;
+        let layoutAparelhos = o.aparelhos.map(ap => {
+            totalOS += (Number(ap.maoObra) + Number(ap.peca));
+            return `<div class="mb-1 text-[11px]">• ${ap.aparelho} (${ap.servico})</div>`;
+        }).join('');
+
+        tbody.innerHTML += `
+            <tr class="hover:bg-gray-50 border-b border-gray-100">
+                <td class="p-3 text-xs font-bold text-gray-500">${o.data.split('-').reverse().join('/')}</td>
+                <td class="p-3">
+                    <span class="font-bold text-blue-600 cursor-pointer underline block" onclick="abrirComprovanteParaPrint(${o.id})">${o.cliente}</span>
+                </td>
+                <td class="p-3 text-xs">${layoutAparelhos}</td>
+                <td class="p-3">
+                    <select onchange="mudarStatus(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-bold">
+                        <option value="Orçamento" ${o.status === 'Orçamento' ? 'selected' : ''}>Orçamento</option>
+                        <option value="Aprovado" ${o.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
+                        <option value="Realizado" ${o.status === 'Realizado' ? 'selected' : ''}>Concluído</option>
+                    </select>
+                </td>
+                <td class="p-3 font-bold text-gray-700 text-sm">R$ ${totalOS.toFixed(2)}</td>
+                <td class="p-3 text-center flex flex-col gap-1">
+                    <button onclick="prepararEdicaoOS(${o.id})" class="text-[10px] bg-blue-500 text-white px-2 py-1 rounded">Editar</button>
+                    <button onclick="deletarOS(${o.id})" class="text-[10px] bg-red-500 text-white px-2 py-1 rounded">Excluir</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+
+function atualizarPlanilhaFiltrada() {
+    const dataInicio = document.getElementById('buscaPlanilhaDataInicio').value;
+    const dataFim = document.getElementById('buscaPlanilhaDataFim').value;
+    const tbody = document.getElementById('corpoPlanilhaGeral');
+    tbody.innerHTML = '';
+
+    const itensFiltrados = bancoOS.filter(o => {
+        const dentroData = (!dataInicio || o.data >= dataInicio) && (!dataFim || o.data <= dataFim);
+        return o.status === 'Realizado' && dentroData;
+    });
+
+    itensFiltrados.sort((a, b) => new Date(b.data) - new Date(a.data));
+    
+    let fatPeriodo = 0, custoPeriodo = 0;
+
+    itensFiltrados.forEach(o => {
+        let totalBrutoOS = 0, totalMaoOS = 0, totalPecaOS = 0;
+        
+        let detalhesAparelhos = o.aparelhos.map(ap => {
+            totalMaoOS += Number(ap.maoObra);
+            totalPecaOS += Number(ap.peca);
+            totalBrutoOS += (Number(ap.maoObra) + Number(ap.peca));
+            return `<div class="text-[10px] mb-1">● ${ap.aparelho} (${ap.servico})</div>`;
+        }).join('');
+
+        fatPeriodo += totalBrutoOS;
+        custoPeriodo += totalPecaOS;
+
+        tbody.innerHTML += `
+            <tr class="hover:bg-gray-50 text-gray-700 border-b">
+                <td class="p-2">${o.data.split('-').reverse().join('/')}</td>
+                <td class="p-2 font-bold">${o.cliente}</td>
+                <td class="p-2">${detalhesAparelhos}</td>
+                <td class="p-2">R$ ${totalMaoOS.toFixed(2)}</td>
+                <td class="p-2 text-red-500">R$ ${totalPecaOS.toFixed(2)}</td>
+                <td class="p-2 font-bold">R$ ${totalBrutoOS.toFixed(2)}</td>
+                <td class="p-2 text-green-600 font-bold">R$ ${totalMaoOS.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+
+    // Atualiza os novos campos de resumo
+    document.getElementById('planilha-qtd-os').innerText = itensFiltrados.length;
+    document.getElementById('planilha-fat-dia').innerText = `R$ ${fatPeriodo.toFixed(2)}`;
+    document.getElementById('planilha-custo-dia').innerText = `R$ ${custoPeriodo.toFixed(2)}`;
+    document.getElementById('planilha-lucro-dia').innerText = `R$ ${(fatPeriodo - custoPeriodo).toFixed(2)}`;
+}
+
+
+function abrirModalHistorico(nomeCliente) {
+    const modal = document.getElementById('modalHistoricoRapido');
+    const corpo = document.getElementById('corpoModalHistorico');
+    const titulo = document.getElementById('tituloModalHistorico');
+    
+    titulo.innerText = `Histórico: ${nomeCliente}`;
+    corpo.innerHTML = '';
+
+    const historico = bancoOS.filter(o => o.cliente.toLowerCase() === nomeCliente.toLowerCase());
+    
+    if (historico.length === 0) {
+        corpo.innerHTML = '<p class="text-center text-gray-500 py-10">Nenhum serviço registrado para este cliente.</p>';
+    } else {
+        // Ordena do mais recente para o mais antigo
+        historico.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(o => {
+            let total = o.aparelhos.reduce((acc, ap) => acc + (Number(ap.maoObra) + Number(ap.peca)), 0);
+            
+            corpo.innerHTML += `
+                <div class="p-3 border rounded-lg bg-gray-50">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="text-xs font-bold">
+                            Data: ${o.data.split('-').reverse().join('/')} | 
+                            <span class="text-blue-600">R$ ${total.toFixed(2)}</span>
+                        </div>
+                        <button onclick="abrirComprovanteParaPrint(${o.id})" class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded hover:bg-blue-700">
+                            Recibo 🖨️
+                        </button>
+                    </div>
+                    <div class="text-sm">
+                        ${o.aparelhos.map(ap => `<div>• ${ap.aparelho} - ${ap.servico}</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+
+function fecharModalHistorico() {
+    document.getElementById('modalHistoricoRapido').classList.add('hidden');
+}
+
+        function abrirComprovanteParaPrint(id) {
+            const o = bancoOS.find(item => item.id === id);
+            if(!o) return;
+
+            const cDados = bancoClientes.find(c => c.nome.toLowerCase() === o.cliente.toLowerCase());
+
+            document.getElementById('printNome').innerText = o.cliente;
+            document.getElementById('printData').innerText = o.data.split('-').reverse().join('/');
+            document.getElementById('printStatus').innerText = o.status;
+
+            if (cDados) {
+                document.getElementById('printClienteContato').innerText = `📱 Contato Cliente: ${cDados.telefone}`;
+                const rua = cDados.rua || 'Sem Endereço';
+                const cidade = cDados.cidade || '';
+                document.getElementById('printClienteEndereco').innerText = `📍 Endereço: ${rua} ${cidade ? ' - ' + cidade : ''}`;
+            } else {
+                document.getElementById('printClienteContato').innerText = `📱 Contato Cliente: ${o.telefone || 'Não informado'}`;
+                document.getElementById('printClienteEndereco').innerText = `📍 Endereço: Não Informado`;
+            }
+
+            const container = document.getElementById('printAparelhosContainer');
+            container.innerHTML = '';
+
+            let totalGeral = 0;
+            o.aparelhos.forEach(ap => {
+                const totalItem = ap.maoObra + ap.peca;
+                totalGeral += totalItem;
+                let obsLayout = ap.observacao ? `<p class="text-[10px] text-amber-600 bg-amber-50 rounded px-1 mt-0.5 italic">Obs: ${ap.observacao}</p>` : '';
+                let marcaTxt = ap.marca && ap.marca !== 'Outra' ? ap.marca + ' ' : '';
+                container.innerHTML += `
+                    <div class="py-1.5 flex flex-col justify-between text-xs border-b border-gray-100 last:border-none">
+                        <div class="flex justify-between items-center w-full">
+                            <div>
+                                <p class="font-bold text-slate-900">${marcaTxt}${ap.aparelho}</p>
+                                <p class="text-[10px] text-gray-500">${ap.servico}</p>
+                            </div>
+                            <p class="font-semibold text-slate-800 shrink-0 ml-2">R$ ${totalItem.toFixed(2)}</p>
+                        </div>
+                        ${obsLayout}
+                    </div>
+                `;
+            });
+
+            document.getElementById('printTotal').innerText = `R$ ${totalGeral.toFixed(2)}`;
+            document.getElementById('modalPrintCliente').classList.remove('hidden');
+        }
+
+        function fecharModalPrint() {
+            document.getElementById('modalPrintCliente').classList.add('hidden');
+        }
+function calcularRelatorioMensal() {
+    const mesSelecionado = document.getElementById('filtroMesRelatorio').value;
+    if(!mesSelecionado) return;
+    
+    document.getElementById('mesReferencia').innerText = mesSelecionado;
+    const itensDoMes = bancoOS.filter(o => o.data.substring(0, 7) === mesSelecionado && o.status === 'Realizado');
+    const tbody = document.getElementById('corpoRelatorioDetalhado');
+    tbody.innerHTML = '';
+
+    let faturamento = 0, custoPecas = 0;
+
+    itensDoMes.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(o => {
+        let mOS = 0, pOS = 0, tOS = 0;
+        
+        // Criamos um bloco detalhado para os aparelhos no relatório
+        let listaAparelhosHTML = o.aparelhos.map(ap => {
+            mOS += Number(ap.maoObra);
+            pOS += Number(ap.peca);
+            tOS += (Number(ap.maoObra) + Number(ap.peca));
+            
+            return `<div class="mb-1 text-[11px]">
+                <strong>${ap.aparelho}</strong>: ${ap.servico} 
+                ${ap.observacao ? `<br/><i class="text-gray-500">Obs: ${ap.observacao}</i>` : ''}
+            </div>`;
+        }).join('');
+
+        faturamento += tOS;
+        custoPecas += pOS;
+
+        tbody.innerHTML += `
+            <tr class="border-b">
+                <td class="p-3">${o.data.split('-').reverse().join('/')}</td>
+                <td class="p-3 font-bold">${o.cliente}</td>
+                <td class="p-3">${listaAparelhosHTML}</td>
+                <td class="p-3 text-right">R$ ${mOS.toFixed(2)}</td>
+                <td class="p-3 text-right text-red-600">R$ ${pOS.toFixed(2)}</td>
+                <td class="p-3 text-right font-bold">R$ ${tOS.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+
+    document.getElementById('rm-total-os').innerText = itensDoMes.length;
+    document.getElementById('rm-faturamento').innerText = `R$ ${faturamento.toFixed(2)}`;
+    document.getElementById('rm-custo').innerText = `R$ ${custoPecas.toFixed(2)}`;
+    document.getElementById('rm-lucro').innerText = `R$ ${(faturamento - custoPecas).toFixed(2)}`;
+}
+
+
+
+        function salvarNotaFiscalDirect(idOS, valorNota) {
+            bancoOS = bancoOS.map(o => {
+                if(o.id === idOS) {
+                    o.notaFiscal = valorNota.trim();
+                }
+                return o;
+            });
+            localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+            salvarNaNuvem();
+        }
+
+        function listarGarantias() {
+            const container = document.getElementById('listaGarantias');
+            container.innerHTML = '';
+            const concluidos = bancoOS.filter(o => o.status === 'Realizado');
+
+            if(concluidos.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-400 col-span-3 font-medium text-center py-4">Nenhum aparelho concluído cadastrado no momento.</p>';
+                return;
+            }
+
+            concluidos.forEach(o => {
+                const partesData = o.data.split('-');
+                const anoOS = parseInt(partesData[0]);
+                const mesOS = parseInt(partesData[1]) - 1;
+                const diaOS = parseInt(partesData[2]);
+
+                const dataFeito = new Date(anoOS, mesOS, diaOS, 0, 0, 0, 0);
+                const dataVencimento = new Date(anoOS, mesOS, diaOS, 0, 0, 0, 0);
+                dataVencimento.setDate(dataVencimento.getDate() + 90); 
+
+                const hojeAux = new Date();
+                const dataHojeZerada = new Date(hojeAux.getFullYear(), hojeAux.getMonth(), hojeAux.getDate(), 0, 0, 0, 0);
+
+                const diferencaTempo = dataVencimento.getTime() - dataHojeZerada.getTime();
+                const restam = Math.floor(diferencaTempo / (1000 * 60 * 60 * 24));
+                
+                let corCard = 'border-green-200 bg-green-50 text-green-800';
+                let txt = `${restam} Dias Restantes`;
+
+                if (restam <= 0) {
+                    corCard = 'border-red-200 bg-red-50 text-red-800';
+                    txt = 'Garantia Expirada';
+                } else if (restam <= 15) {
+                    corCard = 'border-amber-200 bg-amber-50 text-amber-800';
+                }
+
+                let aparelhosTexto = o.aparelhos.map(ap => {
+                    let marcaTxt = ap.marca && ap.marca !== 'Outra' ? ap.marca + ' ' : '';
+                    return marcaTxt + ap.aparelho;
+                }).join(', ');
+                let notaAtual = o.notaFiscal || '';
+
+                container.innerHTML += `
+                    <div class="p-4 border rounded-xl shadow-sm ${corCard} flex flex-col justify-between space-y-3">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-black text-blue-600 cursor-pointer hover:underline text-base" title="Clique para ver o histórico completo" onclick="atalhoVerHistorico('${o.cliente}')">
+                                    👤 ${o.cliente}
+                                </h4>
+                                <span class="text-[10px] text-gray-400 font-bold">${dataFeito.toLocaleDateString('pt-BR')}</span>
+                            </div>
+                            <p class="text-xs font-medium text-gray-700 mt-1">Aparelhos: ${aparelhosTexto}</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5">Vencimento: ${dataVencimento.toLocaleDateString('pt-BR')}</p>
+                        </div>
+                        
+                        <div class="bg-white/70 p-1.5 rounded-lg border border-gray-300 flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase">NF:</span>
+                            <input type="text" id="nf_input_${o.id}" value="${notaAtual}" placeholder="Digitar número da nota" 
+                                onchange="salvarNotaFiscalDirect(${o.id}, this.value)" 
+                                class="w-full bg-transparent text-xs p-0.5 text-gray-800 font-bold border-none outline-none focus:ring-0">
+                        </div>
+
+                        <div class="text-right">
+                            <span class="text-[10px] font-black uppercase px-2 py-0.5 border border-current rounded bg-white/40">${txt}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        let dChart = null;
+        let mChart = null;
+
+       function atualizarResumosHome() {
+    const hoje = new Date().toISOString().split('T')[0];
+    const mesAtual = hoje.substring(0, 7);
+
+    // Filtra apenas status 'Realizado'
+    const itensHoje = bancoOS.filter(o => o.data === hoje && o.status === 'Realizado');
+    const itensMes = bancoOS.filter(o => o.data.substring(0, 7) === mesAtual && o.status === 'Realizado');
+
+    const calcular = (lista) => {
+        let f = 0, c = 0;
+        lista.forEach(o => o.aparelhos.forEach(ap => { f += (Number(ap.maoObra) + Number(ap.peca)); c += Number(ap.peca); }));
+        return { f, c, l: f - c };
+    };
+
+    const h = calcular(itensHoje);
+    document.getElementById('fat-hoje').innerText = `R$ ${h.f.toFixed(2)}`;
+    document.getElementById('custo-hoje').innerText = `R$ ${h.c.toFixed(2)}`;
+    document.getElementById('lucro-hoje').innerText = `R$ ${h.l.toFixed(2)}`;
+
+    const m = calcular(itensMes);
+    document.getElementById('fat-mes').innerText = `R$ ${m.f.toFixed(2)}`;
+    document.getElementById('custo-mes').innerText = `R$ ${m.c.toFixed(2)}`;
+    document.getElementById('lucro-mes').innerText = `R$ ${m.l.toFixed(2)}`;
+    
+    gerarGraficos(); // Mantém o gráfico
+}
+
+
+        function gerarGraficos() {
+            const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            const ultimos7Dias = Array.from({length: 7}, (_, i) => {
+                const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0];
+            }).reverse();
+
+            const faturamentosDiarios = ultimos7Dias.map(dt => {
+                return bancoOS.filter(o => o.data === dt).reduce((acc, o) => {
+                    let totalOS = o.aparelhos.reduce((sub, ap) => sub + (ap.maoObra + ap.peca), 0);
+                    return acc + totalOS;
+                }, 0);
+            });
+            
+            const labelsDias = ultimos7Dias.map(dt => { const d = new Date(dt + 'T00:00:00'); return `${diasSemana[d.getDay()]} (${d.getDate()}/${d.getMonth()+1})`; });
+
+            if(dChart) dChart.destroy();
+            if(mChart) mChart.destroy();
+
+            dChart = new Chart(document.getElementById('chartDiario').getContext('2d'), {
+                type: 'bar',
+                data: { labels: labelsDias, datasets: [{ label: 'Faturamento Bruto R$', data: faturamentosDiarios, backgroundColor: '#2563eb', borderRadius: 5 }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            const listaMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const faturamentosMensais = Array(12).fill(0);
+            
+            bancoOS.forEach(o => { 
+                const m = new Date(o.data + 'T00:00:00').getMonth(); 
+                let totalOS = o.aparelhos.reduce((sub, ap) => sub + (ap.maoObra + ap.peca), 0);
+                faturamentosMensais[m] += totalOS; 
+            });
+
+            mChart = new Chart(document.getElementById('chartMensal').getContext('2d'), {
+                type: 'line',
+                data: { labels: listaMeses, datasets: [{ label: 'Mensal R$', data: faturamentosMensais, borderColor: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.05)', fill: true, tension: 0.15 }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function exportarBackup() {
+            const dados = {
+                clientes: JSON.parse(localStorage.getItem('jvcell_clientes') || '[]'),
+                os: JSON.parse(localStorage.getItem('jvcell_os') || '[]')
+            };
+            const jsonString = JSON.stringify(dados, null, 2);
+            const novaJanela = window.open('', '_blank');
+            novaJanela.document.write('<pre>' + jsonString + '</pre>');
+            novaJanela.document.title = "Backup JV CELL";
+            alert('O backup abriu em uma nova aba! Copie e cole no seu Bloco de Notas.');
+        }
+
+        function colarBackup() {
+            const textoColado = prompt("Cole o código do backup aqui:");
+            if (textoColado) {
+                try {
+                    const conteudo = JSON.parse(textoColado);
+                    localStorage.setItem('jvcell_clientes', JSON.stringify(conteudo.clientes));
+                    localStorage.setItem('jvcell_os', JSON.stringify(conteudo.os));
+                    alert('Dados restaurados! A página será reiniciada.');
+                    location.reload();
+                } catch (erro) {
+                    alert('Erro ao processar o código.');
+                }
+            }
+        }
+        
+        function importarBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const conteudo = JSON.parse(evt.target.result);
+                    localStorage.setItem('jvcell_clientes', JSON.stringify(conteudo.conteudo.clientes || []));
+                    localStorage.setItem('jvcell_os', JSON.stringify(conteudo.os || []));
+                    alert('Backup de arquivo importado com sucesso!');
+                    location.reload();
+                } catch (err) {
+                    alert('Arquivo inválido.');
+                }
+            };
+            reader.readAsText(file);
+        }let bancoPecas = JSON.parse(localStorage.getItem('jvcell_pecas')) || [];
+
+function salvarPeca(e) {
+    e.preventDefault();
+    const idEdicao = document.getElementById('editPecaId').value;
+    
+    const novaPeca = {
+        id: idEdicao ? parseInt(idEdicao) : Date.now(),
+        marca: document.getElementById('pMarca').value,
+        modelo: document.getElementById('pModelo').value,
+        nome: document.getElementById('pNome').value,
+        dist: document.getElementById('pDist').value,
+        valor: document.getElementById('pValor').value
+    };
+
+    if (idEdicao) {
+        const idx = bancoPecas.findIndex(p => p.id == idEdicao);
+        if(idx > -1) bancoPecas[idx] = novaPeca;
+        alert("Peça atualizada com sucesso!"); // Alerta de Edição
+    } else {
+        bancoPecas.push(novaPeca);
+        alert("Peça adicionada ao estoque com sucesso!"); // Alerta de Cadastro
+    }
+
+    localStorage.setItem('jvcell_pecas', JSON.stringify(bancoPecas));
+    document.getElementById('editPecaId').value = '';
+    document.getElementById('pecaForm').reset();
+    
+    salvarNaNuvem(); 
+    renderizarEstoque();
+}
+
+function renderizarEstoque(filtro = 'todos') {
+    const tbody = document.getElementById('tabelaEstoque');
+    const termoBusca = document.getElementById('inputBuscaEstoque').value.toLowerCase();
+    tbody.innerHTML = '';
+    
+    // 1. Aplica filtros
+    let filtrados = filtro !== 'todos' ? bancoPecas.filter(p => p.marca === filtro || p.nome === filtro) : [...bancoPecas];
+    if (termoBusca !== '') {
+        filtrados = filtrados.filter(p => p.modelo.toLowerCase().includes(termoBusca));
+    }
+
+// 2. ORDENAÇÃO: Primeiro por Marca, depois por Modelo
+filtrados.sort((a, b) => {
+    // Ordena pela marca
+    if (a.marca.toLowerCase() !== b.marca.toLowerCase()) {
+        return a.marca.toLowerCase().localeCompare(b.marca.toLowerCase());
+    }
+    // Se a marca for igual, ordena pelo modelo
+    return a.modelo.toLowerCase().localeCompare(b.modelo.toLowerCase());
+});
+
+
+    // 3. Renderiza a tabela
+    filtrados.forEach(p => {
+        const custo = parseFloat(p.valor || 0);
+        const precoReparo = (custo * 2) + 50;
+
+        tbody.innerHTML += `
+            <tr class="border-b hover:bg-gray-50 text-sm">
+                <td class="p-3 font-bold">${p.marca}</td>
+                <td class="p-3 font-semibold text-blue-700">${p.modelo || '-'}</td>
+                <td class="p-3">${p.nome}</td>
+                <td class="p-3 text-gray-500">${p.dist || '-'}</td>
+                <td class="p-3 font-bold text-gray-600">R$ ${custo.toFixed(2)}</td>
+                <td class="p-3 font-black text-emerald-600 bg-emerald-50 rounded">R$ ${precoReparo.toFixed(2)}</td>
+                <td class="p-3 flex gap-2">
+                    <button onclick="editarPeca(${p.id})" class="text-blue-600 bg-blue-50 px-2 py-1 rounded font-bold text-xs">✎</button>
+                    <button onclick="deletarPeca(${p.id})" class="text-red-600 bg-red-50 px-2 py-1 rounded font-bold text-xs">✕</button>
+                </td>
+            </tr>`;
+    });
+}
+
+
+
+
+
+function editarPeca(id) {
+    const p = bancoPecas.find(item => item.id == id);
+    document.getElementById('editPecaId').value = p.id;
+    document.getElementById('pMarca').value = p.marca;
+    document.getElementById('pModelo').value = p.modelo; // Adicionei esta linha caso estivesse faltando
+    document.getElementById('pNome').value = p.nome;
+    document.getElementById('pDist').value = p.dist;
+    document.getElementById('pValor').value = p.valor;
+    
+    // Opcional: rolar a tela para cima para editar
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+function deletarPeca(id) {
+    if (confirm("Tem certeza que deseja remover esta peça do estoque?")) {
+        bancoPecas = bancoPecas.filter(p => p.id != id);
+        localStorage.setItem('jvcell_pecas', JSON.stringify(bancoPecas));
+        salvarNaNuvem(); // Atualiza na nuvem
+        renderizarEstoque();
+        alert("Peça removida com sucesso!"); // Alerta de Remoção
+    }
+}
+
+
+    </script>
+</body>
+</html>
+
+
