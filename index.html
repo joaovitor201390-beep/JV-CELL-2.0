@@ -1805,10 +1805,22 @@ filtrados.sort((a, b) => {
 });
 
 
-    // 3. Renderiza a tabela
+        // 3. Renderiza a tabela
     filtrados.forEach(p => {
         const custo = parseFloat(p.valor || 0);
-        const precoReparo = (custo * 2) + 50;
+        let precoReparo = 0;
+
+        // Lógica de precificação personalizada
+        if (p.nome.includes('Tela')) {
+            // Regra para Telas: custo * 2 + 50
+            precoReparo = (custo * 2) + 50;
+        } else if (p.nome === 'Pelicula') {
+            // Regra para Película: valor original sem nenhuma soma
+            precoReparo = custo;
+        } else {
+            // Regra para Bateria e demais peças: apenas multiplica por 2
+            precoReparo = custo * 2;
+        }
 
         tbody.innerHTML += `
             <tr class="border-b hover:bg-gray-50 text-sm">
@@ -1824,6 +1836,8 @@ filtrados.sort((a, b) => {
                 </td>
             </tr>`;
     });
+
+
 }
 
 
