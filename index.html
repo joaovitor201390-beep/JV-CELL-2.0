@@ -845,18 +845,17 @@ function renderizarOrcamentos() {
     const tbody = document.getElementById('tabelaOrcamentos');
     tbody.innerHTML = '';
     
-    // Filtra para mostrar o que NÃO foi Realizado (ou seja: Orçamento e Aprovado)
+    // Filtramos para mostrar O.S. que não estão concluídas ou reprovadas
     const orcamentos = bancoOS.filter(o => o.status === 'Orçamento' || o.status === 'Aprovado');
     
     if (orcamentos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum orçamento ou O.S. aprovada pendente.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">Nenhum orçamento ou O.S. pendente.</td></tr>';
         return;
     }
     
     orcamentos.forEach(o => {
         let aparelhos = o.aparelhos.map(ap => ap.aparelho).join(', ');
         
-        // Define a cor de fundo baseado no status para ficar visualmente fácil de distinguir
         const bgRow = o.status === 'Aprovado' ? 'bg-blue-50' : 'bg-amber-50';
         
         tbody.innerHTML += `
@@ -868,13 +867,15 @@ function renderizarOrcamentos() {
                     <select onchange="mudarStatusDiretoDaTabela(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-bold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="Orçamento" ${o.status === 'Orçamento' ? 'selected' : ''}>Orçamento</option>
                         <option value="Aprovado" ${o.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
-                        <option value="Realizado">Finalizar (Realizado)</option>
+                        <option value="Realizado" ${o.status === 'Realizado' ? 'selected' : ''}>Realizado</option>
+                        <option value="Reprovado" ${o.status === 'Reprovado' ? 'selected' : ''}>Reprovado</option>
                     </select>
                 </td>
             </tr>
         `;
     });
 }
+
 
 
 // Nova função auxiliar para processar a mudança
@@ -1325,11 +1326,21 @@ function mudarStatusDiretoDaTabela(id, novoStatus) {
             sincronizarTudo();
         }
 
-       function renderizarOS() {
+   function renderizarOS() {
     const tbody = document.getElementById('tabelaOS');
     tbody.innerHTML = '';
 
-    // Ordena o banco do mais recente para o mais antigo automaticamente
+    // Adicionamos a cor vermelha para o status 'Reprovado'
+    const getCorStatus = (status) => {
+        switch(status) {
+            case 'Orçamento': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+            case 'Aprovado':  return 'bg-purple-100 text-purple-800 border-purple-300';
+            case 'Realizado': return 'bg-green-100 text-green-800 border-green-300';
+            case 'Reprovado': return 'bg-red-100 text-red-800 border-red-300';
+            default: return 'bg-gray-100 text-gray-800 border-gray-300';
+        }
+    };
+
     const listaOrdenada = [...bancoOS].sort((a, b) => new Date(b.data) - new Date(a.data));
 
     listaOrdenada.forEach(o => {
@@ -1347,10 +1358,11 @@ function mudarStatusDiretoDaTabela(id, novoStatus) {
                 </td>
                 <td class="p-3 text-xs">${layoutAparelhos}</td>
                 <td class="p-3">
-                    <select onchange="mudarStatus(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-bold">
+                    <select onchange="mudarStatus(${o.id}, this.value)" class="p-1 text-xs border rounded font-bold cursor-pointer outline-none ${getCorStatus(o.status)}">
                         <option value="Orçamento" ${o.status === 'Orçamento' ? 'selected' : ''}>Orçamento</option>
                         <option value="Aprovado" ${o.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
                         <option value="Realizado" ${o.status === 'Realizado' ? 'selected' : ''}>Concluído</option>
+                        <option value="Reprovado" ${o.status === 'Reprovado' ? 'selected' : ''}>Reprovado</option>
                     </select>
                 </td>
                 <td class="p-3 font-bold text-gray-700 text-sm">R$ ${totalOS.toFixed(2)}</td>
@@ -1362,6 +1374,7 @@ function mudarStatusDiretoDaTabela(id, novoStatus) {
         `;
     });
 }
+
 
 
 function atualizarPlanilhaFiltrada() {
