@@ -1,5 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+    <style>
+    /* O container que dará a vida à rolagem horizontal */
+    .tabela-responsiva {
+        width: 100%;
+        overflow-x: auto; /* Esta linha cria a barra de rolagem */
+        -webkit-overflow-scrolling: touch; /* Suaviza no iPhone */
+    }
+    
+    /* Garante que a tabela tenha tamanho mínimo para não ficar espremida */
+    .tabela-estoque-formatada {
+        min-width: 600px;
+        width: 100%;
+    }
+</style>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -461,108 +476,109 @@
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Marca *</label>
             <select id="pMarca" required class="w-full p-2 border rounded bg-white">
-                <option value="Samsung">Samsung</option>
-                <option value="Motorola">Motorola</option>
-                <option value="Infinix">Infinix</option>
-                <option value="Iphone">Iphone</option>
-                <option value="Realme">Realme</option>
-                <option value="Xiaomi">Xiaomi</option>
-                <option value="LG">LG</option>
-            </select>
-        </div>
-        <div><div>
-    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Modelo *</label>
-    <input type="text" id="pModelo" required placeholder="Ex: Galaxy A32, Moto G60" class="w-full p-2 border rounded">
-</div>
-
-            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Peça *</label>
-          
-<select id="pNome" required class="w-full p-2 border rounded bg-white">
-    <option value="Tela Original c/ Aro">Tela Original c/ Aro</option>
-    <option value="Tela Paralela c/ Aro">Tela Paralela c/ Aro</option>
-    <option value="Tela Paralela">Tela Paralela</option>
-    <option value="Tela Original">Tela Original</option>
-    <option value="Conector de carga">Conector de carga</option>
-    <option value="Pelicula">Pelicula</option>
-    <option value="Bateria">Bateria</option>
-    <option value="Flex">Flex</option>
-    <option value="Alto falante">Alto falante</option>
-    <option value="Camera">Camera</option>
-    <option value="Lente camera">Lente camera</option>
-    <option value="Carcaca">Carcaca</option>
-    <option value="Tampa traseira">Tampa traseira</option>
+    <option value="Samsung">Samsung</option>
+    <option value="Motorola">Motorola</option>
+    <option value="Iphone">Iphone</option>
+    <option value="Infinix">Infinix</option>
+    <option value="Xiaomi">Xiaomi</option>
+    <option value="Realme">Realme</option>
+    <option value="Lg">Lg</option>
+    <option value="Outra">Outra</option>
 </select>
 
-
+<!-- Seleção de Peças -->
+<select id="pNome" required class="w-full p-2 border rounded bg-white">
+    <option value="Tela paralela c/ aro">Tela paralela c/ aro</option>
+    <option value="Tela original c/ aro">Tela original c/ aro</option>
+    <option value="Tela paralela s/ aro">Tela paralela s/ aro</option>
+    <option value="Tela original s/ aro">Tela original s/ aro</option>
+    <option value="Pelicula">Pelicula</option>
+    <option value="Bateria">Bateria</option>
+    <option value="Placa de carga">Placa de carga</option>
+    <option value="Camera">Camera</option>
+    <option value="Lente de camera">Lente de camera</option>
+    <option value="Alto falante">Alto falante</option>
+    <option value="Flex botao">Flex botao</option>
+    <option value="Flex de carga">Flex de carga</option>
+    <option value="Carcaça">Carcaça</option>
+    <option value="Tampa traseira">Tampa traseira</option>
+</select>
+<div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Modelo *</label>
+        <input type="text" id="pModelo" required placeholder="Ex: A12, Moto G60" class="w-full p-2 border rounded">
+    </div>
         </div>
-        <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Distribuidora</label>
-            <input type="text" id="pDist" placeholder="Ex: Mercado Livre/Loja X" class="w-full p-2 border rounded">
-        </div>
-        <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor (R$)</label>
-            <input type="number" step="0.01" id="pValor" required class="w-full p-2 border rounded">
-        </div>
-        <div class="md:col-span-2 flex items-end">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">Salvar Peça no Estoque</button>
-        </div>
-    </form>
-
-    <<div class="space-y-4">
-   <div class="flex flex-wrap gap-2" id="filtrosEstoque">
-    <button onclick="renderizarEstoque('todos')" class="bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-bold">Todos</button>
-    
-    <!-- Filtros de Marca -->
-    <span class="text-xs font-bold text-gray-400 self-center border-l pl-2">MARCAS:</span>
-    <button onclick="renderizarEstoque('Samsung')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Samsung</button>
-    <button onclick="renderizarEstoque('Motorola')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Motorola</button>
-    <button onclick="renderizarEstoque('Infinix')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Infinix</button>
-    <button onclick="renderizarEstoque('Iphone')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Iphone</button>
-    <button onclick="renderizarEstoque('Realme')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Realme</button>
-    <button onclick="renderizarEstoque('Xiaomi')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Xiaomi</button>
-    <button onclick="renderizarEstoque('LG')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">LG</button>
-    
-<!-- Filtros de Peças -->
-<span class="text-xs font-bold text-gray-400 self-center border-l pl-2">PEÇAS:</span>
-<button onclick="renderizarEstoque('Tela Original c/ Aro')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Original c/ Aro</button>
-<button onclick="renderizarEstoque('Tela Paralela c/ Aro')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Paralela c/ Aro</button>
-<button onclick="renderizarEstoque('Tela Paralela')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Tela Paralela</button>
-<button onclick="renderizarEstoque('Tela Original')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Tela Original</button>
-<button onclick="renderizarEstoque('Conector de carga')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Conector</button>
-
-
-    <button onclick="renderizarEstoque('Tela')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Tela</button>
-    <button onclick="renderizarEstoque('Conector de carga')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Conector</button>
-    <button onclick="renderizarEstoque('Pelicula')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Pelicula</button>
-    <button onclick="renderizarEstoque('Bateria')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Bateria</button>
-    <button onclick="renderizarEstoque('Flex')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Flex</button>
-    <button onclick="renderizarEstoque('Alto falante')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Alto falante</button>
-    <button onclick="renderizarEstoque('Camera')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Camera</button>
-    <button onclick="renderizarEstoque('Lente camera')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Lente camera</button>
-    <button onclick="renderizarEstoque('Carcaca')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Carcaca</button>
-    <button onclick="renderizarEstoque('Tampa traseira')" class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Tampa traseira</button>
-<div class="mb-4">
-    <input type="text" id="inputBuscaEstoque" onkeyup="renderizarEstoque('todos')" 
-           placeholder="🔍 Buscar pelo modelo (Ex: A32, Moto G60)..." 
-           class="w-full p-3 border rounded-xl shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
+       <!-- Linha final do formulário com alinhamento corrigido -->
+<div class="md:col-span-3 flex items-end gap-2">
+    <div class="flex-1">
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Distribuidora</label>
+        <input type="text" id="pDist" placeholder="Distribuidora" class="w-full p-2 border rounded">
+    </div>
+    <div class="w-24">
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Custo</label>
+        <input type="number" step="0.01" id="pValor" placeholder="R$" required class="w-full p-2 border rounded">
+    </div>
+    <button type="submit" class="h-[42px] bg-blue-600 text-white px-6 rounded-lg font-bold flex items-center justify-center">
+        Salvar Peça
+    </button>
 </div>
 
-<table class="w-full text-left">
-    <thead class="bg-gray-100 text-xs uppercase">
-    <tr>
-        <th class="p-3">Marca</th>
-        <th class="p-3">Modelo</th> 
-        <th class="p-3">Peça</th>
-        <th class="p-3">Dist.</th>
-        <th class="p-3">Custo</th> <th class="p-3">Sugestão Reparo</th> <th class="p-3">Ações</th>
-    </tr>
-</thead>
+    </form>
 
-    <tbody id="tabelaEstoque" class="divide-y"></tbody>
-</table>
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3">
+        <div class="flex flex-wrap gap-2">
+            <select id="filtroMarca" onchange="renderizarEstoque()" class="border p-2 rounded text-xs font-bold">
+    <option value="todos">Todas as Marcas</option>
+    <option value="Samsung">Samsung</option>
+    <option value="Motorola">Motorola</option>
+    <option value="Iphone">Iphone</option>
+    <option value="Infinix">Infinix</option>
+    <option value="Xiaomi">Xiaomi</option>
+    <option value="Realme">Realme</option>
+    <option value="Lg">Lg</option>
+</select>
 
+<!-- Filtro de Peça -->
+<select id="filtroPeca" onchange="renderizarEstoque()" class="border p-2 rounded text-xs font-bold">
+    <option value="todos">Todas as Peças</option>
+<option value="Tela paralela c/ aro">Tela paralela c/ aro</option>
+    <option value="Tela original c/ aro">Tela original c/ aro</option>
+    <option value="Tela paralela s/ aro">Tela paralela s/ aro</option>
+    <option value="Tela original s/ aro">Tela original s/ aro</option>
+    <option value="Pelicula">Pelicula</option>
+    <option value="Bateria">Bateria</option>
+    <option value="Placa de carga">Placa de carga</option>
+    <option value="Camera">Camera</option>
+    <option value="Lente de camera">Lente de camera</option>
+    <option value="Alto falante">Alto falante</option>
+    <option value="Flex botao">Flex botao</option>
+    <option value="Flex de carga">Flex de carga</option>
+    <option value="Carcaça">Carcaça</option>
+    <option value="Tampa traseira">Tampa traseira</option>
+</select>
+            <input type="text" id="inputBuscaEstoque" onkeyup="renderizarEstoque()" placeholder="🔍 Buscar modelo..." class="border p-2 rounded text-xs flex-1">
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden border">
+        <div class="tabela-responsiva">
+            <table class="tabela-estoque-formatada w-full text-left">
+                <thead class="bg-gray-100 text-[10px] uppercase">
+                    <tr>
+                        <th class="p-3 w-16">Marca</th>
+                        <th class="p-3 w-14">Modelo</th>
+                        <th class="p-3 w-16">Peça</th>
+                        <th class="p-3 w-20">Custo</th>
+                        <th class="p-3 w-20">Venda Sugerida</th>
+                        <th class="p-3 w-20">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaEstoque" class="divide-y text-xs"></tbody>
+            </table>
+        </div>
     </div>
 </section>
+
 
         </div>
     </div>
@@ -854,17 +870,29 @@ function renderizarOrcamentos() {
     }
     
     orcamentos.forEach(o => {
-        let aparelhos = o.aparelhos.map(ap => ap.aparelho).join(', ');
+        // Criamos uma visualização detalhada dos aparelhos
+        let detalhesAparelhos = o.aparelhos.map(ap => {
+            let totalItem = Number(ap.maoObra) + Number(ap.peca);
+            return `<div class="text-[11px] border-b pb-1 mb-1">
+                        <strong>${ap.marca} ${ap.aparelho}</strong><br>
+                        ${ap.servico} - R$ ${totalItem.toFixed(2)}
+                    </div>`;
+        }).join('');
         
         const bgRow = o.status === 'Aprovado' ? 'bg-blue-50' : 'bg-amber-50';
         
         tbody.innerHTML += `
-            <tr class="${bgRow} hover:opacity-90">
-                <td class="p-3 font-bold">${o.cliente}</td>
-                <td class="p-3 text-xs">${aparelhos}</td>
-                <td class="p-3 text-xs">${o.data.split('-').reverse().join('/')}</td>
+            <tr class="${bgRow} hover:opacity-95 border-b">
+                <td class="p-3">
+                    <span class="font-bold text-blue-600 cursor-pointer underline" onclick="abrirComprovanteParaPrint(${o.id})">
+                        ${o.cliente}
+                    </span>
+                    <div class="text-[10px] text-gray-500 mt-1">Tel: ${o.telefone || 'Não informado'}</div>
+                </td>
+                <td class="p-3">${detalhesAparelhos}</td>
+                <td class="p-3 text-xs font-bold">${o.data.split('-').reverse().join('/')}</td>
                 <td class="p-3 text-center">
-                    <select onchange="mudarStatusDiretoDaTabela(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-bold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500">
+                    <select onchange="mudarStatusDiretoDaTabela(${o.id}, this.value)" class="p-1 text-[10px] border rounded bg-white font-bold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="Orçamento" ${o.status === 'Orçamento' ? 'selected' : ''}>Orçamento</option>
                         <option value="Aprovado" ${o.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
                         <option value="Realizado" ${o.status === 'Realizado' ? 'selected' : ''}>Realizado</option>
@@ -875,6 +903,7 @@ function renderizarOrcamentos() {
         `;
     });
 }
+
 
 
 
@@ -1551,14 +1580,17 @@ function calcularRelatorioMensal() {
 
         tbody.innerHTML += `
             <tr class="border-b">
-                <td class="p-3">${o.data.split('-').reverse().join('/')}</td>
-                <td class="p-3 font-bold">${o.cliente}</td>
-                <td class="p-3">${listaAparelhosHTML}</td>
-                <td class="p-3 text-right">R$ ${mOS.toFixed(2)}</td>
-                <td class="p-3 text-right text-red-600">R$ ${pOS.toFixed(2)}</td>
-                <td class="p-3 text-right font-bold">R$ ${tOS.toFixed(2)}</td>
-            </tr>
-        `;
+        <td class="p-3 font-bold text-xs">${p.marca}</td>
+         <td class="p-3 font-bold text-blue-600 w-20 truncate">${p.modelo}</td> 
+       
+        <td class="p-3 text-xs">${p.nome}</td>
+        <td class="p-3 text-gray-500 text-xs">R$ ${custo.toFixed(2)}</td>
+        <td class="p-3 font-black text-green-600 text-xs">R$ ${precoVenda.toFixed(2)}</td>
+        <td class="p-3 flex gap-2">
+            <button onclick="editarPeca(${p.id})" class="text-blue-600">✎</button>
+            <button onclick="deletarPeca(${p.id})" class="text-red-600">✕</button>
+        </td>
+    </tr>`;
     });
 
     document.getElementById('rm-total-os').innerText = itensDoMes.length;
@@ -1795,63 +1827,44 @@ function salvarPeca(e) {
     salvarNaNuvem(); 
     renderizarEstoque();
 }
-
-function renderizarEstoque(filtro = 'todos') {
+function renderizarEstoque() {
     const tbody = document.getElementById('tabelaEstoque');
-    const termoBusca = document.getElementById('inputBuscaEstoque').value.toLowerCase();
+    const fMarca = document.getElementById('filtroMarca').value;
+    const fPeca = document.getElementById('filtroPeca').value;
+    const fBusca = document.getElementById('inputBuscaEstoque').value.toLowerCase();
+    
     tbody.innerHTML = '';
     
-    // 1. Aplica filtros
-    let filtrados = filtro !== 'todos' ? bancoPecas.filter(p => p.marca === filtro || p.nome === filtro) : [...bancoPecas];
-    if (termoBusca !== '') {
-        filtrados = filtrados.filter(p => p.modelo.toLowerCase().includes(termoBusca));
-    }
+    // Filtro combinado: checa todas as condições
+    let filtrados = bancoPecas.filter(p => {
+        const matchMarca = (fMarca === 'todos' || p.marca === fMarca);
+        const matchPeca = (fPeca === 'todos' || p.nome === fPeca);
+        const matchBusca = (p.modelo.toLowerCase().includes(fBusca));
+        return matchMarca && matchPeca && matchBusca;
+    });
 
-// 2. ORDENAÇÃO: Primeiro por Marca, depois por Modelo
-filtrados.sort((a, b) => {
-    // Ordena pela marca
-    if (a.marca.toLowerCase() !== b.marca.toLowerCase()) {
-        return a.marca.toLowerCase().localeCompare(b.marca.toLowerCase());
-    }
-    // Se a marca for igual, ordena pelo modelo
-    return a.modelo.toLowerCase().localeCompare(b.modelo.toLowerCase());
-});
+    filtrados.sort((a, b) => a.marca.localeCompare(b.marca));
 
-
-        // 3. Renderiza a tabela
     filtrados.forEach(p => {
         const custo = parseFloat(p.valor || 0);
-        let precoReparo = 0;
-
-        // Lógica de precificação personalizada
-        if (p.nome.includes('Tela')) {
-            // Regra para Telas: custo * 2 + 50
-            precoReparo = (custo * 2) + 50;
-        } else if (p.nome === 'Pelicula') {
-            // Regra para Película: valor original sem nenhuma soma
-            precoReparo = custo;
-        } else {
-            // Regra para Bateria e demais peças: apenas multiplica por 2
-            precoReparo = custo * 2;
-        }
+        // Regra de preço: Tela (x2 + 50), Outros (x2)
+        const precoVenda = p.nome === 'Tela' ? (custo * 2) + 50 : (custo * 2);
 
         tbody.innerHTML += `
-            <tr class="border-b hover:bg-gray-50 text-sm">
+            <tr>
                 <td class="p-3 font-bold">${p.marca}</td>
-                <td class="p-3 font-semibold text-blue-700">${p.modelo || '-'}</td>
+                <td class="p-3 font-bold text-blue-600">${p.modelo}</td>
                 <td class="p-3">${p.nome}</td>
-                <td class="p-3 text-gray-500">${p.dist || '-'}</td>
-                <td class="p-3 font-bold text-gray-600">R$ ${custo.toFixed(2)}</td>
-                <td class="p-3 font-black text-emerald-600 bg-emerald-50 rounded">R$ ${precoReparo.toFixed(2)}</td>
+                <td class="p-3 text-gray-500">R$ ${custo.toFixed(2)}</td>
+                <td class="p-3 font-black text-green-600">R$ ${precoVenda.toFixed(2)}</td>
                 <td class="p-3 flex gap-2">
-                    <button onclick="editarPeca(${p.id})" class="text-blue-600 bg-blue-50 px-2 py-1 rounded font-bold text-xs">✎</button>
-                    <button onclick="deletarPeca(${p.id})" class="text-red-600 bg-red-50 px-2 py-1 rounded font-bold text-xs">✕</button>
+                    <button onclick="editarPeca(${p.id})" class="text-blue-600">✎</button>
+                    <button onclick="deletarPeca(${p.id})" class="text-red-600">✕</button>
                 </td>
             </tr>`;
     });
-
-
 }
+
 
 
 
