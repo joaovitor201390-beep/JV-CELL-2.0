@@ -1607,76 +1607,61 @@ function calcularRelatorioMensal() {
             localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
             salvarNaNuvem();
         }
+function listarGarantias() {
+    const container = document.getElementById('listaGarantias');
+    container.innerHTML = '';
+    const concluidos = bancoOS.filter(o => o.status === 'Realizado');
 
-        function listarGarantias() {
-            const container = document.getElementById('listaGarantias');
-            container.innerHTML = '';
-            const concluidos = bancoOS.filter(o => o.status === 'Realizado');
+    if(concluidos.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-400 col-span-3 font-medium text-center py-4">Nenhum aparelho concluído cadastrado no momento.</p>';
+        return;
+    }
 
-            if(concluidos.length === 0) {
-                container.innerHTML = '<p class="text-sm text-gray-400 col-span-3 font-medium text-center py-4">Nenhum aparelho concluído cadastrado no momento.</p>';
-                return;
-            }
+    concluidos.forEach(o => {
+        // Cálculo de datas (Garantia de 90 dias)
+        const partesData = o.data.split('-');
+        const dataFeito = new Date(parseInt(partesData[0]), parseInt(partesData[1]) - 1, parseInt(partesData[2]));
+        const dataVencimento = new Date(dataFeito);
+        dataVencimento.setDate(dataVencimento.getDate() + 90); 
 
-            concluidos.forEach(o => {
-                const partesData = o.data.split('-');
-                const anoOS = parseInt(partesData[0]);
-                const mesOS = parseInt(partesData[1]) - 1;
-                const diaOS = parseInt(partesData[2]);
+        const hojeAux = new Date();
+        const dataHojeZerada = new Date(hojeAux.getFullYear(), hojeAux.getMonth(), hojeAux.getDate());
+        const restam = Math.floor((dataVencimento.getTime() - dataHojeZerada.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Cores do card
+        let corCard = restam <= 0 ? 'border-red-200 bg-red-50 text-red-800' : (restam <= 15 ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-green-200 bg-green-50 text-green-800');
+        let txt = restam <= 0 ? 'Garantia Expirada' : `${restam} Dias Restantes`;
 
-                const dataFeito = new Date(anoOS, mesOS, diaOS, 0, 0, 0, 0);
-                const dataVencimento = new Date(anoOS, mesOS, diaOS, 0, 0, 0, 0);
-                dataVencimento.setDate(dataVencimento.getDate() + 90); 
+        // Coletar dados dos aparelhos
+        let totalOS = 0;
+        let detalhesServicos = o.aparelhos.map(ap => {
+            totalOS += (Number(ap.maoObra) + Number(ap.peca));
+            return `<div class="text-[10px] border-b border-black/10 py-1">
+                        <b>${ap.marca} ${ap.aparelho}</b>: ${ap.servico}
+                    </div>`;
+        }).join('');
 
-                const hojeAux = new Date();
-                const dataHojeZerada = new Date(hojeAux.getFullYear(), hojeAux.getMonth(), hojeAux.getDate(), 0, 0, 0, 0);
-
-                const diferencaTempo = dataVencimento.getTime() - dataHojeZerada.getTime();
-                const restam = Math.floor(diferencaTempo / (1000 * 60 * 60 * 24));
+        // Montar o Card
+        container.innerHTML += `
+            <div class="p-4 border rounded-xl shadow-sm ${corCard} flex flex-col justify-between space-y-2">
+                <div>
+                    <h4 class="font-black text-blue-600 text-base cursor-pointer underline" onclick="abrirComprovanteParaPrint(${o.id})">
+                        👤 ${o.cliente}
+                    </h4>
+                    <p class="text-xs font-bold text-gray-700">📱 ${o.telefone || 'Sem telefone'}</p>
+                    <div class="mt-2 text-gray-800">${detalhesServicos}</div>
+                    <p class="text-sm font-black mt-2 text-blue-800">💰 Valor: R$ ${totalOS.toFixed(2)}</p>
+                </div>
                 
-                let corCard = 'border-green-200 bg-green-50 text-green-800';
-                let txt = `${restam} Dias Restantes`;
+                <div class="text-right pt-2 border-t border-black/10">
+                    <span class="text-[10px] font-black uppercase px-2 py-0.5 border border-current rounded">${txt}</span>
+                </div>
+            </div>
+        `;
+    });
+}
 
-                if (restam <= 0) {
-                    corCard = 'border-red-200 bg-red-50 text-red-800';
-                    txt = 'Garantia Expirada';
-                } else if (restam <= 15) {
-                    corCard = 'border-amber-200 bg-amber-50 text-amber-800';
-                }
 
-                let aparelhosTexto = o.aparelhos.map(ap => {
-                    let marcaTxt = ap.marca && ap.marca !== 'Outra' ? ap.marca + ' ' : '';
-                    return marcaTxt + ap.aparelho;
-                }).join(', ');
-                let notaAtual = o.notaFiscal || '';
-
-                container.innerHTML += `
-                    <div class="p-4 border rounded-xl shadow-sm ${corCard} flex flex-col justify-between space-y-3">
-                        <div>
-                            <div class="flex items-center justify-between">
-                                <h4 class="font-black text-blue-600 cursor-pointer hover:underline text-base" title="Clique para ver o histórico completo" onclick="atalhoVerHistorico('${o.cliente}')">
-                                    👤 ${o.cliente}
-                                </h4>
-                                <span class="text-[10px] text-gray-400 font-bold">${dataFeito.toLocaleDateString('pt-BR')}</span>
-                            </div>
-                            <p class="text-xs font-medium text-gray-700 mt-1">Aparelhos: ${aparelhosTexto}</p>
-                            <p class="text-[11px] text-gray-500 mt-0.5">Vencimento: ${dataVencimento.toLocaleDateString('pt-BR')}</p>
-                        </div>
-                        
-                        <div class="bg-white/70 p-1.5 rounded-lg border border-gray-300 flex items-center gap-1.5">
-                            <span class="text-[10px] font-bold text-gray-500 uppercase">NF:</span>
-                            <input type="text" id="nf_input_${o.id}" value="${notaAtual}" placeholder="Digitar número da nota" 
-                                onchange="salvarNotaFiscalDirect(${o.id}, this.value)" 
-                                class="w-full bg-transparent text-xs p-0.5 text-gray-800 font-bold border-none outline-none focus:ring-0">
-                        </div>
-
-                        <div class="text-right">
-                            <span class="text-[10px] font-black uppercase px-2 py-0.5 border border-current rounded bg-white/40">${txt}</span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
 
         let dChart = null;
         let mChart = null;
