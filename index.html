@@ -1563,7 +1563,6 @@ function calcularRelatorioMensal() {
     itensDoMes.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(o => {
         let mOS = 0, pOS = 0, tOS = 0;
         
-        // Criamos um bloco detalhado para os aparelhos no relatório
         let listaAparelhosHTML = o.aparelhos.map(ap => {
             mOS += Number(ap.maoObra);
             pOS += Number(ap.peca);
@@ -1580,17 +1579,13 @@ function calcularRelatorioMensal() {
 
         tbody.innerHTML += `
             <tr class="border-b">
-        <td class="p-3 font-bold text-xs">${p.marca}</td>
-         <td class="p-3 font-bold text-blue-600 w-20 truncate">${p.modelo}</td> 
-       
-        <td class="p-3 text-xs">${p.nome}</td>
-        <td class="p-3 text-gray-500 text-xs">R$ ${custo.toFixed(2)}</td>
-        <td class="p-3 font-black text-green-600 text-xs">R$ ${precoVenda.toFixed(2)}</td>
-        <td class="p-3 flex gap-2">
-            <button onclick="editarPeca(${p.id})" class="text-blue-600">✎</button>
-            <button onclick="deletarPeca(${p.id})" class="text-red-600">✕</button>
-        </td>
-    </tr>`;
+                <td class="p-3 font-bold text-xs">${o.data.split('-').reverse().join('/')}</td>
+                <td class="p-3 text-xs">${o.cliente}</td>
+                <td class="p-3 text-xs">${listaAparelhosHTML}</td>
+                <td class="p-3 text-right text-xs">R$ ${mOS.toFixed(2)}</td>
+                <td class="p-3 text-right text-red-600 text-xs">R$ ${pOS.toFixed(2)}</td>
+                <td class="p-3 text-right font-bold text-xs">R$ ${tOS.toFixed(2)}</td>
+            </tr>`;
     });
 
     document.getElementById('rm-total-os').innerText = itensDoMes.length;
@@ -1598,6 +1593,7 @@ function calcularRelatorioMensal() {
     document.getElementById('rm-custo').innerText = `R$ ${custoPecas.toFixed(2)}`;
     document.getElementById('rm-lucro').innerText = `R$ ${(faturamento - custoPecas).toFixed(2)}`;
 }
+
 
 
 
@@ -1719,12 +1715,15 @@ function calcularRelatorioMensal() {
                 const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0];
             }).reverse();
 
-            const faturamentosDiarios = ultimos7Dias.map(dt => {
-                return bancoOS.filter(o => o.data === dt).reduce((acc, o) => {
+                                    const faturamentosDiarios = ultimos7Dias.map(dt => {
+                // Adicionamos o filtro status === 'Realizado' aqui
+                return bancoOS.filter(o => o.data === dt && o.status === 'Realizado').reduce((acc, o) => {
                     let totalOS = o.aparelhos.reduce((sub, ap) => sub + (ap.maoObra + ap.peca), 0);
                     return acc + totalOS;
                 }, 0);
             });
+
+
             
             const labelsDias = ultimos7Dias.map(dt => { const d = new Date(dt + 'T00:00:00'); return `${diasSemana[d.getDay()]} (${d.getDate()}/${d.getMonth()+1})`; });
 
@@ -1740,11 +1739,16 @@ function calcularRelatorioMensal() {
             const listaMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
             const faturamentosMensais = Array(12).fill(0);
             
-            bancoOS.forEach(o => { 
-                const m = new Date(o.data + 'T00:00:00').getMonth(); 
-                let totalOS = o.aparelhos.reduce((sub, ap) => sub + (ap.maoObra + ap.peca), 0);
-                faturamentosMensais[m] += totalOS; 
+                                    bancoOS.forEach(o => { 
+                // Filtramos apenas os realizados
+                if(o.status === 'Realizado') {
+                    const m = new Date(o.data + 'T00:00:00').getMonth(); 
+                    let totalOS = o.aparelhos.reduce((sub, ap) => sub + (ap.maoObra + ap.peca), 0);
+                    faturamentosMensais[m] += totalOS; 
+                }
             });
+
+
 
             mChart = new Chart(document.getElementById('chartMensal').getContext('2d'), {
                 type: 'line',
@@ -1847,8 +1851,20 @@ function renderizarEstoque() {
 
     filtrados.forEach(p => {
         const custo = parseFloat(p.valor || 0);
-        // Regra de preço: Tela (x2 + 50), Outros (x2)
-        const precoVenda = p.nome === 'Tela' ? (custo * 2) + 50 : (custo * 2);
+        // Nova lógica de cálculo de venda sugerida
+        let precoVenda;
+        if (p.nome.includes('Tela')) {
+            // Se for qualquer tipo de tela, multiplica por 2 e soma 50
+            precoVenda = (custo * 2) + 50;
+        } else if (p.nome === 'Pelicula') {
+            // Se for película, mantém o valor original
+            precoVenda = custo;
+        } else {
+            // Demais itens, apenas multiplica por 2
+            precoVenda = (custo * 2);
+        }
+
+
 
         tbody.innerHTML += `
             <tr>
